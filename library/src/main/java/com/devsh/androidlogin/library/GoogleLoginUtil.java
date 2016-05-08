@@ -1,27 +1,33 @@
 /*
- * Copyright (C) 2015 Suhan Lee
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Copyright (C) 2016 Suhan Lee
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
+
 package com.devsh.androidlogin.library;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
+import com.devsh.androidlogin.library.callback.GoogleLoginInResultCallback;
+import com.devsh.androidlogin.library.data.SharedData;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -31,40 +37,47 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
-public class GoogleSignInUtil {
+public class GoogleLoginUtil {
     private final static String TAG = "GoogleSignInUtil";
-    private final static String SERVER_CLIENT_ID = "486150556496-2h0adv5kgeesn7s6303ri6kbn6cncpu5.apps.googleusercontent.com";
     private final static int RC_SIGN_IN = 100;
-    private final GoogleSignInOptions gso;
+    private static GoogleSignInOptions gso;
 
-    private static GoogleSignInUtil sInstance;
+    private static GoogleLoginUtil sInstance;
+    private static String sServerClientID;
     private GoogleApiClient googleApiClient;
+    private Context context;
+    private GoogleLoginInResultCallback loginResultCallback;
+    private ResultCallback<Status> logoutResultCallback;
 
-    public static GoogleSignInUtil getInstance() {
+    public static GoogleLoginUtil getInstance() {
         if (sInstance == null) {
-            sInstance = new GoogleSignInUtil();
+            sInstance = new GoogleLoginUtil();
         }
         return sInstance;
     }
 
-    private GoogleSignInUtil() {
+    public static void setServerClientID(String serverClientID) {
+        sServerClientID = serverClientID;
+    }
+
+    private GoogleLoginUtil() {
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestProfile()
                 .requestEmail()
-                .requestIdToken(SERVER_CLIENT_ID)
+                .requestIdToken(sServerClientID)
                 .build();
-
-
     }
 
     public void initialize(FragmentActivity activity) {
+        // TODO: sServerClientID 가 설정되어 있지 않다면 예외 발생
+        context = activity;
         googleApiClient = new GoogleApiClient.Builder(activity)
                 .enableAutoManage(activity /* FragmentActivity */, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+                        Log.e(TAG, "onConnectionFailed: " + connectionResult);
                     }
                 } /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
@@ -90,8 +103,15 @@ public class GoogleSignInUtil {
         });
     }
 
-    public void isConnected() {
-        Log.i(TAG, "isConnected()" + googleApiClient.isConnected());
+    public boolean isConnected() {
+        boolean isConnected = googleApiClient.isConnected();
+
+        Log.i(TAG, "isConnected()" + isConnected);
+        return isConnected;
+    }
+
+    public boolean isSigned(Context context) {
+        return SharedData.getGoogleId(context) != null && SharedData.getGoogleIdToken(context) != null;
     }
 
     public void signIn(Activity activity) {
@@ -104,9 +124,9 @@ public class GoogleSignInUtil {
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        Log.i(TAG, "getStatus():" + status.getStatus());
-                        Log.i(TAG, "statusCode:" + status.getStatusCode());
-                        Log.i(TAG, "statusMessage:" + status.getStatusMessage());
+                        if (logoutResultCallback != null) {
+                            logoutResultCallback.onResult(status);
+                        }
                     }
                 });
     }
@@ -117,20 +137,27 @@ public class GoogleSignInUtil {
             Log.i(TAG, "Signed in");
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            String personName = acct.getDisplayName();
-            String personEmail = acct.getEmail();
-            String personId = acct.getId();
-            Uri personPhoto = acct.getPhotoUrl();
-            String idToken = acct.getIdToken();
-            Log.i(TAG, "signInResult personName:" + personName);
-            Log.i(TAG, "signInResult personEmail:" + personEmail);
-            Log.i(TAG, "signInResult personId:" + personId);
-            Log.i(TAG, "signInResult idToken:" + idToken);
-            Log.i(TAG, "signInResult personPhoto:" + personPhoto);
+            String userName = acct.getDisplayName();
+            String userEmail = acct.getEmail();
+            String userId = acct.getId();
+            Uri userPhoto = acct.getPhotoUrl();
+            String userIdToken = acct.getIdToken();
+
+            SharedData.putGoogleIdToken(context, userIdToken);
+            SharedData.putGoogleId(context, userId);
+            SharedData.putGoogleUserName(context, userName);
+            SharedData.putGoogleUserEmail(context, userEmail);
+            SharedData.putGoogleUserPhoto(context, userPhoto.toString());
+
+            if (loginResultCallback != null) {
+                loginResultCallback.onSuccess(result);
+            }
         } else {
             Log.i(TAG, "Signed out");
-            // Signed out, show unauthenticated UI.
-//            updateUI(false);
+
+            if (loginResultCallback != null) {
+                loginResultCallback.onFail(result);
+            }
         }
     }
 
@@ -140,5 +167,13 @@ public class GoogleSignInUtil {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
+    }
+
+    public void setLoginResultCallback(GoogleLoginInResultCallback callback) {
+        loginResultCallback = callback;
+    }
+
+    public void setLogoutResultCallback(ResultCallback<Status> callback) {
+        logoutResultCallback = callback;
     }
 }
