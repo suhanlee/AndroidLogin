@@ -18,6 +18,7 @@ import com.facebook.AccessToken;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -29,16 +30,17 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = "AndroidLogin";
     private String GOOGLE_SERVER_CLIENT_ID = "486150556496-2h0adv5kgeesn7s6303ri6kbn6cncpu5.apps.googleusercontent.com";
 
-    private Button btnFacebookSignIn;
+    private LoginButton btnFacebookSignIn;
     private Button btnGoogleSignin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ServerLogin.initialize(Common.API_BASE_URL);
 
+        ServerLogin.initialize(Common.API_BASE_URL);
         AndroidLogin.initialzie(this, GOOGLE_SERVER_CLIENT_ID);            // Google, Facebook only
+
+        setContentView(R.layout.activity_main);
 
         if (AndroidLogin.isLoginedWithGoogle()) {
             Intent intent = new Intent(MainActivity.this, FeedActivity.class);
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnFacebookSignIn = (Button) findViewById(R.id.btnFacebookSignIn);
+        btnFacebookSignIn = (LoginButton) findViewById(R.id.btnFacebookSignIn);
         btnFacebookSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

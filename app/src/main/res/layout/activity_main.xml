@@ -10,28 +10,29 @@
     tools:context="com.devsh.androidlogin.MainActivity">
 
     <Button
+        android:background="@drawable/btn_google_plus_signin_dark_normal_xhdpi"
+        android:id="@+id/btnGoogleSignIn"
+        android:textColor="@color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Google Sign-in"
-        android:id="@+id/btnGoogleSignIn"
-        android:layout_marginTop="43dp"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Facebook Sign-in"
-        android:id="@+id/btnFacebookSignIn"
-        android:layout_below="@+id/btnGoogleSignIn"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="44dp" />
 
-    <!--<com.facebook.login.widget.LoginButton-->
-        <!--android:id="@+id/login_button"-->
+    <!--<Button-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_centerHorizontal="true" />-->
+        <!--android:text="Facebook Sign-in"-->
+        <!--android:id="@+id/btnFacebookSignIn"-->
+        <!--android:layout_below="@+id/btnGoogleSignIn"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginTop="44dp" />-->
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/btnFacebookSignIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/btnGoogleSignIn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="43dp" />
 </RelativeLayout>
