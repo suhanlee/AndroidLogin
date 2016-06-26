@@ -23,10 +23,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.devsh.androidlogin.library.data.SharedData;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
@@ -91,23 +93,51 @@ public class FacebookLoginUtil {
             }
         };
 
-        profileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(
-                    Profile oldProfile,
-                    Profile currentProfile) {
-                Log.i(TAG, "oldProfile" + oldProfile + "currentProfile" + currentProfile);
-            }
-        };
+//        profileTracker = new ProfileTracker() {
+//            @Override
+//            protected void onCurrentProfileChanged(
+//                    Profile oldProfile,
+//                    Profile currentProfile) {
+//                Log.i(TAG, "oldProfile" + oldProfile + "currentProfile" + currentProfile);
+//            }
+//        };
 
         loginCallback = nullCallback;
         logoutCallback = nullCallback;
         updateTokenCallback = nullCallback;
+
+        // LoginResultCallback
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Profile profile = Profile.getCurrentProfile();
+
+                SharedData.putAccountProvider(sContext, SharedData.PROVIDER_FACEBOOK);
+                SharedData.putAccountId(sContext, profile.getId());
+                SharedData.putAccountIdToken(sContext, loginResult.getAccessToken().getToken());
+                SharedData.putAccountUserName(sContext, profile.getName());
+                SharedData.putAccountUserPhoto(sContext, profile.getProfilePictureUri(200, 200).getPath());
+                // No email
+
+                loginResultCallback.onSuccess(loginResult);
+            }
+
+            @Override
+            public void onCancel() {
+                loginResultCallback.onCancel();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                loginResultCallback.onError(error);
+            }
+        });
+
     }
 
     public void setLoginResultCallback(FacebookCallback<LoginResult> callback) {
         loginResultCallback = callback;
-        LoginManager.getInstance().registerCallback(callbackManager, loginResultCallback);
     }
 
     public void setLogoutResultCallback(Callback callback) {

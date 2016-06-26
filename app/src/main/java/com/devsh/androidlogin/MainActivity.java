@@ -11,11 +11,13 @@ import android.widget.Button;
 import com.devsh.androidlogin.library.FacebookLoginUtil;
 import com.devsh.androidlogin.library.callback.GoogleLoginInResultCallback;
 import com.devsh.androidlogin.library.AndroidLogin;
+import com.devsh.androidlogin.library.data.SharedData;
+import com.devsh.androidlogin.library.server.ServerLogin;
+import com.devsh.androidlogin.library.server.ServerLoginResultCallback;
 import com.facebook.AccessToken;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -24,9 +26,9 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-    private LoginButton loginButton;
     private String TAG = "AndroidLogin";
-    private String SERVER_CLIENT_ID = "486150556496-2h0adv5kgeesn7s6303ri6kbn6cncpu5.apps.googleusercontent.com";
+    private String GOOGLE_SERVER_CLIENT_ID = "486150556496-2h0adv5kgeesn7s6303ri6kbn6cncpu5.apps.googleusercontent.com";
+
     private Button btnFacebookSignIn;
     private Button btnGoogleSignin;
 
@@ -34,9 +36,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ServerLogin.initialize(Common.API_BASE_URL);
 
-        AndroidLogin.initialzie(this, SERVER_CLIENT_ID);            // Google, Facebook only
-//        LoginManager.initialzie(this);                            // Facebook only
+        AndroidLogin.initialzie(this, GOOGLE_SERVER_CLIENT_ID);            // Google, Facebook only
+
+        if (AndroidLogin.isLoginedWithGoogle()) {
+            Intent intent = new Intent(MainActivity.this, FeedActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         btnGoogleSignin = (Button) findViewById(R.id.btnGoogleSignIn);
         btnGoogleSignin.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         AndroidLogin.setGoogleLoginResultCallback(new GoogleLoginInResultCallback() {
             @Override
             public void onSuccess(GoogleSignInResult result) {
-                Log.i(TAG, "onSuccess: " + result);
+                tryLogin();
 
                 updateUI();
             }
@@ -95,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.i(TAG, "onSuccess: " + loginResult);
-
+                tryLogin();
                 updateUI();
             }
 
@@ -145,6 +153,36 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         updateUI();
+    }
+
+    public void tryLogin() {
+        Log.i(TAG, "id:" + SharedData.getAccountId(getApplicationContext()));
+        Log.i(TAG, "userName:" + SharedData.getAccountUserName(getApplicationContext()));
+        Log.i(TAG, "userEmail:" + SharedData.getAccountUserEmail(getApplicationContext()));
+        Log.i(TAG, "userPhoto:" + SharedData.getAccountUserPhoto(getApplicationContext()));
+        Log.i(TAG, "token:" + SharedData.getAccountIdToken(getApplicationContext()));
+
+        if (SharedData.getServerToken(getApplicationContext()) == null) {
+            // Try Login
+            ServerLogin.login(getApplicationContext(), new ServerLoginResultCallback() {
+                        @Override
+                        public void onSuccess(String apiToken) {
+                            SharedData.putServerToken(getApplicationContext(), apiToken);
+                            Intent intent = new Intent(MainActivity.this, FeedActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+
+                        @Override
+                        public void onFail(String error) {
+                            Log.i(TAG, "onFail : " + error);
+
+                        }
+                    });
+        } else {
+            // Continues Login
+            Log.i(TAG, "continues login");
+        }
     }
 
     public void updateUI() {

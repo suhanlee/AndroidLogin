@@ -20,45 +20,73 @@ package com.devsh.androidlogin.library.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 
 public class SharedData {
-    private static String GOOGLE_ID_TOKEN_KEY = "GOOGLE_ID_TOKEN_KEY";
-    private static String GOOGLE_ID_KEY = "GOOGLE_ID_KEY";
-    private static String GOOGLE_USER_NAME_KEY = "GOOGLE_USER_NAME_KEY";
-    private static String GOOGLE_USER_EMAIL_KEY = "GOOGLE_USER_EMAIL_KEY";
-    private static String GOOGLE_USER_PHOTO_KEY = "GOOGLE_USER_PHOTO_KEY";
 
-    public static void putGoogleUserEmail(Context context, String userEmail) {
-        putSharedPreferenceString(context, GOOGLE_USER_EMAIL_KEY, userEmail);
+    public final static String PROVIDER_GOOGLE = "google_oauth2";
+    public final static String PROVIDER_TWITTER = "twitter";
+    public final static String PROVIDER_FACEBOOK = "facebook";
+
+    private static final String ACCOUNT_PROVIDER_KEY = "PROVIDER_KEY";
+
+    // Account Information
+    private static String ACCOUNT_ID_TOKEN_KEY = "ACCOUNT_ID_TOKEN_KEY";
+    private static String ACCOUNT_ID_KEY = "ACCOUNT_ID_KEY";
+    private static String ACCOUNT_USER_NAME_KEY = "ACCOUNT_USER_NAME_KEY";
+    private static String ACCOUNT_USER_EMAIL_KEY = "ACCOUNT_USER_EMAIL_KEY";
+    private static String ACCOUNT_USER_PHOTO_KEY = "ACCOUNT_USER_PHOTO_KEY";
+    private static String SERVER_TOKEN = "SERVER_TOKEN";
+
+    private static String ACCOUNT_LOGGED_IN_KEY = "ACCOUNT_IS_LOGGED_IN_KEY";
+
+    public static void putServerToken(Context context, String serverToken) {
+        putSharedPreferenceString(context, SERVER_TOKEN, serverToken);
     }
 
-    public static void putGoogleUserPhoto(Context context, String userPhoto) {
-        putSharedPreferenceString(context, GOOGLE_USER_PHOTO_KEY, userPhoto);
+    public static String getServerToken(Context context) {
+        return getSharedPreferenceString(context, SERVER_TOKEN);
     }
 
-    public static void putGoogleUserName(Context context, String userName) {
-        putSharedPreferenceString(context, GOOGLE_USER_NAME_KEY, userName);
+    public static void putAccountUserEmail(Context context, String userEmail) {
+        putSharedPreferenceString(context, ACCOUNT_USER_EMAIL_KEY, userEmail);
     }
 
-    public static String getGoogleUserName(Context context) {
-        return getSharedPreferenceString(context, GOOGLE_USER_NAME_KEY);
+    public static String getAccountUserEmail(Context context) {
+        return getSharedPreferenceString(context, ACCOUNT_USER_EMAIL_KEY);
     }
 
-    public static void putGoogleId(Context context, String id) {
-        putSharedPreferenceString(context, GOOGLE_ID_KEY, id);
+    public static void putAccountUserPhoto(Context context, String userPhoto) {
+        putSharedPreferenceString(context, ACCOUNT_USER_PHOTO_KEY, userPhoto);
     }
 
-    public static void putGoogleIdToken(Context context, String idToken) {
-        putSharedPreferenceString(context, GOOGLE_ID_TOKEN_KEY, idToken);
+    public static String getAccountUserPhoto(Context context) {
+        return getSharedPreferenceString(context, ACCOUNT_USER_PHOTO_KEY);
     }
 
-    public static String getGoogleId(Context context) {
-        return getSharedPreferenceString(context, GOOGLE_ID_KEY);
+    public static void putAccountUserName(Context context, String userName) {
+        putSharedPreferenceString(context, ACCOUNT_USER_NAME_KEY, userName);
     }
 
-    public static String getGoogleIdToken(Context context) {
-        return getSharedPreferenceString(context, GOOGLE_ID_TOKEN_KEY);
+    public static String getAccountUserName(Context context) {
+        return getSharedPreferenceString(context, ACCOUNT_USER_NAME_KEY);
+    }
+
+    public static void putAccountId(Context context, String id) {
+        putSharedPreferenceString(context, ACCOUNT_ID_KEY, id);
+    }
+
+    public static void putAccountIdToken(Context context, String idToken) {
+        putSharedPreferenceString(context, ACCOUNT_ID_TOKEN_KEY, idToken);
+    }
+
+    public static String getAccountId(Context context) {
+        return getSharedPreferenceString(context, ACCOUNT_ID_KEY);
+    }
+
+    public static String getAccountIdToken(Context context) {
+        return getSharedPreferenceString(context, ACCOUNT_ID_TOKEN_KEY);
     }
 
     private static String getSharedPreferenceString(Context context, String key) {
@@ -76,6 +104,24 @@ public class SharedData {
     }
 
     public static void putSharedPreferenceString(Context context, String key, String value){
+        putSharedPreference(context, key, value);
+    }
+
+    private static Boolean getSharedPreferenceBoolean(Context context, String key) {
+        return getSharedPreferenceBoolean(context, key, false);
+    }
+
+    private static Boolean getSharedPreferenceBoolean(Context context, String key, Boolean defaultReturnValue) {
+        try{
+            SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+            return mSharedPrefs.getBoolean(key, defaultReturnValue);
+        }catch(NullPointerException e){
+            e.printStackTrace();
+            return defaultReturnValue;
+        }
+    }
+
+    public static void putSharedPreferenceBoolean(Context context, String key, Boolean value){
         putSharedPreference(context, key, value);
     }
 
@@ -109,6 +155,19 @@ public class SharedData {
         editor.commit();
     }
 
+    public static String getAccountProvider(Context context) {
+        return getSharedPreferenceString(context, ACCOUNT_PROVIDER_KEY);
+    }
 
+    public static void putAccountProvider(Context context, String provider) {
+        putSharedPreferenceString(context, ACCOUNT_PROVIDER_KEY, provider);
+    }
 
+    public static boolean isLoggedIn(Context context) {
+        return getSharedPreferenceBoolean(context, ACCOUNT_LOGGED_IN_KEY);
+    }
+
+    public static void setLoggedIn(Context context, boolean isLoggedIn) {
+        putSharedPreferenceBoolean(context, ACCOUNT_LOGGED_IN_KEY, isLoggedIn);
+    }
 }

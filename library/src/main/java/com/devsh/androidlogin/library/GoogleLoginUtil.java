@@ -110,8 +110,10 @@ public class GoogleLoginUtil {
         return isConnected;
     }
 
-    public boolean isSigned(Context context) {
-        return SharedData.getGoogleId(context) != null && SharedData.getGoogleIdToken(context) != null;
+    public boolean isSignedIn(Context context) {
+        return SharedData.getAccountId(context) != null
+                && SharedData.getAccountIdToken(context) != null
+                && SharedData.isLoggedIn(context);
     }
 
     public void signIn(Activity activity) {
@@ -143,11 +145,15 @@ public class GoogleLoginUtil {
             Uri userPhoto = acct.getPhotoUrl();
             String userIdToken = acct.getIdToken();
 
-            SharedData.putGoogleIdToken(context, userIdToken);
-            SharedData.putGoogleId(context, userId);
-            SharedData.putGoogleUserName(context, userName);
-            SharedData.putGoogleUserEmail(context, userEmail);
-            SharedData.putGoogleUserPhoto(context, userPhoto.toString());
+            SharedData.putAccountProvider(context, SharedData.PROVIDER_GOOGLE);
+            SharedData.putAccountIdToken(context, userIdToken);
+            SharedData.putAccountId(context, userId);
+            SharedData.putAccountUserName(context, userName);
+            SharedData.putAccountUserEmail(context, userEmail);
+
+            if (userPhoto != null) {
+                SharedData.putAccountUserPhoto(context, userPhoto.toString());
+            }
 
             if (loginResultCallback != null) {
                 loginResultCallback.onSuccess(result);

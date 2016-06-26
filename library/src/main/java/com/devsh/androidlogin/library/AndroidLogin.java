@@ -30,7 +30,6 @@ import com.facebook.login.LoginResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class AndroidLogin {
@@ -73,7 +72,7 @@ public class AndroidLogin {
 
     public static void loginWithFacebook(Activity activity, List<String> user_status) {
         loginSelected = LoginMethod.Facebook;
-        FacebookLoginUtil.getInstance().logIn(activity, Arrays.asList("user_status"));
+        FacebookLoginUtil.getInstance().logIn(activity, user_status);
     }
 
     public static void logoutWithGoogle() {
@@ -86,7 +85,7 @@ public class AndroidLogin {
     }
 
     public static boolean isLoginedWithGoogle() {
-        return GoogleLoginUtil.getInstance().isSigned(sContext);
+        return GoogleLoginUtil.getInstance().isSignedIn(sContext);
     }
 
     public static boolean isLoginedWithFacebook() {
