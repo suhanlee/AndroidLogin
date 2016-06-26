@@ -1,4 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'io.fabric'
+
+/*
+    twitter sdk gradle references : https://fabric.io/kits/android/twitterkit/install
+ */
 
 android {
     compileSdkVersion 23
@@ -23,6 +28,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.google.android.gms:play-services-auth:8.4.0'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    compile('com.twitter.sdk.android:twitter-core:1.6.8@aar') {
+        transitive = true;
+    }
 
     // for server
     compile 'com.squareup.retrofit2:retrofit:2.0.0'

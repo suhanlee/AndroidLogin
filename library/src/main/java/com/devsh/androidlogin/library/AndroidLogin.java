@@ -29,21 +29,40 @@ import com.facebook.FacebookCallback;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.util.List;
 
+import io.fabric.sdk.android.Fabric;
+
 public class AndroidLogin {
+
+    private static final int TWITTER_REQUEST_CODE = 140;
 
     private static Context sContext;
 
+    public static void setTwitterLoginResultCallback(TwitterLoginButton loginButton, Callback<TwitterSession> callback) {
+        TwitterLoginUtil.getInstance().setLoginButton(loginButton);
+        TwitterLoginUtil.getInstance().setCallback(callback);
+    }
+
     public enum LoginMethod {
         Facebook,
-        Google
+        Google,
+        Twitter
     }
 
     private static LoginMethod loginSelected;
 
     public static void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == TWITTER_REQUEST_CODE) {
+            loginSelected = LoginMethod.Twitter;
+        }
+
         switch (loginSelected) {
             case Google:
                 GoogleLoginUtil.getInstance().onActivityResult(requestCode, resultCode, data);
@@ -51,17 +70,29 @@ public class AndroidLogin {
             case Facebook:
                 FacebookLoginUtil.getInstance().onActivityResult(requestCode, resultCode, data);
                 break;
+            case Twitter:
+                TwitterLoginUtil.getInstance().onActivityResult(requestCode, resultCode, data);
+                break;
         }
+    }
+    public static void initialize(FragmentActivity context, String twitterKey, String twitterSecetKey, String serverClientID) {
+        TwitterAuthConfig authConfig =  new TwitterAuthConfig(twitterKey, twitterSecetKey);
+        Fabric.with(context, new TwitterCore(authConfig));
+        TwitterLoginUtil.getInstance().initialize(context);
+
+        initialzie(context, serverClientID);
     }
 
     public static void initialzie(FragmentActivity context, String serverClientID) {
         GoogleLoginUtil.setServerClientID(serverClientID);
+
         initialzie(context);
     }
 
     public static void initialzie(FragmentActivity context) {
         sContext = context;
         GoogleLoginUtil.getInstance().initialize(context);
+
         FacebookLoginUtil.initialize(context);
     }
 
@@ -75,6 +106,10 @@ public class AndroidLogin {
         FacebookLoginUtil.getInstance().logIn(activity, user_status);
     }
 
+    public static void loginWithTwitter(Activity activity) {
+        loginSelected = LoginMethod.Twitter;
+    }
+
     public static void logoutWithGoogle() {
         GoogleLoginUtil.getInstance().signOut();
         SharedData.clearSharedPreference(sContext);
@@ -84,7 +119,7 @@ public class AndroidLogin {
         FacebookLoginUtil.getInstance().logout();
     }
 
-    public static boolean isLoginedWithGoogle() {
+    public static boolean isLogined() {
         return GoogleLoginUtil.getInstance().isSignedIn(sContext);
     }
 

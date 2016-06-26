@@ -22,6 +22,11 @@ import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.util.Arrays;
 
@@ -29,30 +34,49 @@ public class MainActivity extends AppCompatActivity {
 
     private String TAG = "AndroidLogin";
     private String GOOGLE_SERVER_CLIENT_ID = "486150556496-2h0adv5kgeesn7s6303ri6kbn6cncpu5.apps.googleusercontent.com";
+    private String TWITTER_API_KEY = "stBDcBVHLNu1nD1f2FQvtfMkm";
+    private String TWITTER_SECRET_KEY = "T6Lc9dwRoK6FedzI5NDtYSWQs3UvRIyLVXws8OShFeU7mL358O";
 
     private LoginButton btnFacebookSignIn;
     private Button btnGoogleSignin;
+    private TwitterLoginButton btnTwitterLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         ServerLogin.initialize(Common.API_BASE_URL);
-        AndroidLogin.initialzie(this, GOOGLE_SERVER_CLIENT_ID);            // Google, Facebook only
+        AndroidLogin.initialize(this, TWITTER_API_KEY, TWITTER_SECRET_KEY, GOOGLE_SERVER_CLIENT_ID); // twitter, google, facebook
+//        AndroidLogin.initialzie(this, GOOGLE_SERVER_CLIENT_ID);            // Google, Facebook only
 
         setContentView(R.layout.activity_main);
 
-        if (AndroidLogin.isLoginedWithGoogle()) {
+        if (AndroidLogin.isLogined()) {
             Intent intent = new Intent(MainActivity.this, FeedActivity.class);
             startActivity(intent);
             finish();
         }
 
+        btnTwitterLogin = (TwitterLoginButton) findViewById(R.id.btnTwitterLogin);
+        AndroidLogin.setTwitterLoginResultCallback(btnTwitterLogin, new Callback<TwitterSession>() {
+
+            @Override
+            public void success(Result<TwitterSession> result) {
+                tryLogin();
+                updateUI();
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                Log.d("TwitterKit", "Login with Twitter failure", exception);
+            }
+        });
+
         btnGoogleSignin = (Button) findViewById(R.id.btnGoogleSignIn);
         btnGoogleSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (AndroidLogin.isLoginedWithGoogle()) {
+                if (AndroidLogin.isLogined()) {
                     AndroidLogin.logoutWithGoogle();
                 } else {
                     AndroidLogin.loginWithGoogle(MainActivity.this);
@@ -167,20 +191,20 @@ public class MainActivity extends AppCompatActivity {
         if (SharedData.getServerToken(getApplicationContext()) == null) {
             // Try Login
             ServerLogin.login(getApplicationContext(), new ServerLoginResultCallback() {
-                        @Override
-                        public void onSuccess(String apiToken) {
-                            SharedData.putServerToken(getApplicationContext(), apiToken);
-                            Intent intent = new Intent(MainActivity.this, FeedActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
+                @Override
+                public void onSuccess(String apiToken) {
+                    SharedData.putServerToken(getApplicationContext(), apiToken);
+                    Intent intent = new Intent(MainActivity.this, FeedActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
 
-                        @Override
-                        public void onFail(String error) {
-                            Log.i(TAG, "onFail : " + error);
+                @Override
+                public void onFail(String error) {
+                    Log.i(TAG, "onFail : " + error);
 
-                        }
-                    });
+                }
+            });
         } else {
             // Continues Login
             Log.i(TAG, "continues login");
@@ -191,13 +215,7 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (AndroidLogin.isLoginedWithFacebook()) {
-                    btnFacebookSignIn.setText("Facebook Logout");
-                } else {
-                    btnFacebookSignIn.setText("Facebook Login");
-                }
-
-                if (AndroidLogin.isLoginedWithGoogle()) {
+                if (AndroidLogin.isLogined()) {
                     btnGoogleSignin.setText("Google Logout");
                 } else {
                     btnGoogleSignin.setText("Google Login");

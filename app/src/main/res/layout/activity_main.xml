@@ -17,16 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true" />
 
-
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Facebook Sign-in"-->
-        <!--android:id="@+id/btnFacebookSignIn"-->
-        <!--android:layout_below="@+id/btnGoogleSignIn"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_marginTop="44dp" />-->
-
     <com.facebook.login.widget.LoginButton
         android:id="@+id/btnFacebookSignIn"
         android:layout_width="wrap_content"
@@ -35,4 +25,14 @@
         android:layout_below="@+id/btnGoogleSignIn"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="43dp" />
+
+    <com.twitter.sdk.android.core.identity.TwitterLoginButton
+        android:id="@+id/btnTwitterLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnFacebookSignIn"
+        android:layout_alignRight="@+id/btnGoogleSignIn"
+        android:layout_alignEnd="@+id/btnGoogleSignIn"
+        android:layout_marginTop="66dp" />
+
 </RelativeLayout>
