@@ -47,14 +47,11 @@ public class MainActivity extends AppCompatActivity {
 
         ServerLogin.initialize(Common.API_BASE_URL);
         AndroidLogin.initialize(this, TWITTER_API_KEY, TWITTER_SECRET_KEY, GOOGLE_SERVER_CLIENT_ID); // twitter, google, facebook
-//        AndroidLogin.initialzie(this, GOOGLE_SERVER_CLIENT_ID);            // Google, Facebook only
-
         setContentView(R.layout.activity_main);
 
         if (AndroidLogin.isLogined()) {
             Intent intent = new Intent(MainActivity.this, FeedActivity.class);
-            startActivity(intent);
-            finish();
+            AndroidLogin.loggined(this, intent);
         }
 
         btnTwitterLogin = (TwitterLoginButton) findViewById(R.id.btnTwitterLogin);
@@ -206,8 +203,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         } else {
-            // Continues Login
+            // already token is there.
             Log.i(TAG, "continues login");
+
         }
     }
 

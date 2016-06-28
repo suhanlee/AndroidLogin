@@ -26,6 +26,7 @@ import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 public class TwitterLoginUtil {
@@ -62,9 +63,7 @@ public class TwitterLoginUtil {
                 SharedData.putAccountId(context, session.getUserId() +"");
                 SharedData.putAccountUserName(context, session.getUserName());
 
-                if (callback != null) {
-                    callback.success(result);
-                }
+                tryGetEmailAddress(session, result);
             }
             @Override
             public void failure(TwitterException exception) {
@@ -74,6 +73,28 @@ public class TwitterLoginUtil {
             }
         });
 
+    }
+
+    private void tryGetEmailAddress(TwitterSession session, final Result<TwitterSession> twitterSessionResult) {
+        TwitterAuthClient authClient = new TwitterAuthClient();
+        authClient.requestEmail(session, new Callback<String>() {
+            @Override
+            public void success(Result<String> result) {
+                // Do something with the result, which provides the email address
+                SharedData.putAccountUserEmail(context, result.data);
+
+                if (callback != null) {
+                    callback.success(twitterSessionResult);
+                }
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                if (callback != null) {
+                    callback.success(twitterSessionResult);
+                }
+            }
+        });
     }
 
     public void setCallback(Callback<TwitterSession> callback) {

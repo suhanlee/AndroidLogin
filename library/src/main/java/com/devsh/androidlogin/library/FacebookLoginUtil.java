@@ -117,7 +117,7 @@ public class FacebookLoginUtil {
                 SharedData.putAccountId(sContext, profile.getId());
                 SharedData.putAccountIdToken(sContext, loginResult.getAccessToken().getToken());
                 SharedData.putAccountUserName(sContext, profile.getName());
-                SharedData.putAccountUserPhoto(sContext, profile.getProfilePictureUri(200, 200).getPath());
+                SharedData.putAccountUserPhoto(sContext, profile.getProfilePictureUri(200, 200).toString());
                 // No email
 
                 loginResultCallback.onSuccess(loginResult);

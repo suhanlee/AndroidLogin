@@ -50,31 +50,30 @@ public class AndroidLogin {
         TwitterLoginUtil.getInstance().setCallback(callback);
     }
 
-    public enum LoginMethod {
-        Facebook,
-        Google,
-        Twitter
+    public static void loggined(Activity activity, Intent intent) {
+        if (SharedData.getAccountProvider(activity).equals(SharedData.PROVIDER_GOOGLE)) {
+            GoogleLoginUtil.getInstance().signIn(activity);
+        }
     }
-
-    private static LoginMethod loginSelected;
 
     public static void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TWITTER_REQUEST_CODE) {
-            loginSelected = LoginMethod.Twitter;
+            SharedData.putAccountProvider(sContext, SharedData.PROVIDER_TWITTER);
         }
 
-        switch (loginSelected) {
-            case Google:
+        switch (SharedData.getAccountProvider(sContext)) {
+            case SharedData.PROVIDER_GOOGLE:
                 GoogleLoginUtil.getInstance().onActivityResult(requestCode, resultCode, data);
                 break;
-            case Facebook:
+            case SharedData.PROVIDER_FACEBOOK:
                 FacebookLoginUtil.getInstance().onActivityResult(requestCode, resultCode, data);
                 break;
-            case Twitter:
+            case SharedData.PROVIDER_TWITTER:
                 TwitterLoginUtil.getInstance().onActivityResult(requestCode, resultCode, data);
                 break;
         }
     }
+    
     public static void initialize(FragmentActivity context, String twitterKey, String twitterSecetKey, String serverClientID) {
         TwitterAuthConfig authConfig =  new TwitterAuthConfig(twitterKey, twitterSecetKey);
         Fabric.with(context, new TwitterCore(authConfig));
@@ -97,17 +96,29 @@ public class AndroidLogin {
     }
 
     public static void loginWithGoogle(Activity activity) {
-        loginSelected = LoginMethod.Google;
+        SharedData.putAccountProvider(activity, SharedData.PROVIDER_GOOGLE);
         GoogleLoginUtil.getInstance().signIn(activity);
     }
 
     public static void loginWithFacebook(Activity activity, List<String> user_status) {
-        loginSelected = LoginMethod.Facebook;
+        SharedData.putAccountProvider(activity, SharedData.PROVIDER_FACEBOOK);
         FacebookLoginUtil.getInstance().logIn(activity, user_status);
     }
 
-    public static void loginWithTwitter(Activity activity) {
-        loginSelected = LoginMethod.Twitter;
+    public static void loginWithTwitter(Context context) {
+        SharedData.putAccountProvider(context, SharedData.PROVIDER_TWITTER);
+    }
+
+    public static void logout() {
+        if (SharedData.getAccountProvider(sContext).equals(SharedData.PROVIDER_GOOGLE)) {
+//            GoogleLoginUtil.getInstance().signOut();
+        }
+
+        if (SharedData.getAccountProvider(sContext).equals(SharedData.PROVIDER_FACEBOOK)) {
+            FacebookLoginUtil.getInstance().logout();
+        }
+
+        SharedData.clearSharedPreference(sContext);
     }
 
     public static void logoutWithGoogle() {
