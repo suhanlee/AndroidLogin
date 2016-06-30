@@ -112,7 +112,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Cu
             this.authorName = (TextView) view.findViewById(R.id.author_name);
             this.authorImage = (ImageView) view.findViewById(R.id.author_image);
 
-            this.imageView = (ImageView) view.findViewById(R.id.thumbnail);
+            this.imageView = (ImageView) view.findViewById(R.id.videoView);
             this.textView = (TextView) view.findViewById(R.id.title);
 
             this.feedbackLike = (TextView) view.findViewById(R.id.like_count);

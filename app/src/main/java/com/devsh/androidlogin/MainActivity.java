@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.devsh.androidlogin.library.FacebookLoginUtil;
 import com.devsh.androidlogin.library.callback.GoogleLoginInResultCallback;
@@ -199,13 +200,16 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFail(String error) {
                     Log.i(TAG, "onFail : " + error);
+                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
 
                 }
             });
         } else {
             // already token is there.
             Log.i(TAG, "continues login");
-
+            Intent intent = new Intent(MainActivity.this, FeedActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 

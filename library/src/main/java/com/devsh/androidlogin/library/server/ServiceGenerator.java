@@ -25,13 +25,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceGenerator {
 
+    private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
     public static <S> S createService(String apiUrl, Class<S> serviceClass) {
         Retrofit.Builder builder = new Retrofit.Builder().baseUrl(apiUrl).addConverterFactory(GsonConverterFactory.create());
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+//        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-        Retrofit retrofit = builder.client(client).build();
+        Retrofit retrofit = builder.client(httpClient.build()).build();
         return retrofit.create(serviceClass);
     }
 }
