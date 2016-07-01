@@ -18,7 +18,10 @@
 
 package com.devsh.androidlogin;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -30,47 +33,50 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.devsh.androidlogin.feed.model.FeedItem;
+import com.google.gson.Gson;
 
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
-public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.CustomViewHolder> {
+public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapter.CustomViewHolder> {
+    public static String FEED_ITEM_KEY = "FEED_ITEM";
+
     private List<FeedItem> feedItemList;
 
-    private Context context;
+    private Activity activity;
 
-    public MyRecyclerAdapter(Context context, List<FeedItem> feedItemList) {
-        this.context = context;
+    public FeedRecyclerAdapter(Activity activity, List<FeedItem> feedItemList) {
+        this.activity = activity;
         this.feedItemList = feedItemList;
     }
 
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-//        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, viewGroup, false);
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, viewGroup, false);
+//        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.feed_list_row, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.feed_list_row, viewGroup, false);
         CustomViewHolder viewHolder = new CustomViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(CustomViewHolder customViewHolder, int i) {
-        FeedItem feedItem = feedItemList.get(i);
+        final FeedItem feedItem = feedItemList.get(i);
 
         // Author Name
         customViewHolder.authorName.setText(feedItem.getAuthor().getName());
 
         // Author Image
         Glide
-                .with(context)
+                .with(activity)
                 .load(feedItem.getAuthor().getImage_url())
-                .bitmapTransform(new CropCircleTransformation(context))
+                .bitmapTransform(new CropCircleTransformation(activity))
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(customViewHolder.authorImage);
 
         // Movie Image
         Glide
-                .with(context)
+                .with(activity)
                 .load(feedItem.getThumb_movie_url())
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(customViewHolder.imageView);
@@ -82,6 +88,22 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Cu
         customViewHolder.feedbackLike.setText(feedItem.getFeedback().getLike());
         customViewHolder.feedbackDislike.setText(feedItem.getFeedback().getDislike());
         customViewHolder.commentsCount.setText(feedItem.getComments().size()+"");
+
+        // Touch
+        customViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(activity, MovieActivity.class);
+                Bundle bundle = new Bundle();
+                String json = (new Gson()).toJson(feedItem);
+
+                bundle.putString(FEED_ITEM_KEY, json);
+                intent.putExtras(bundle);
+
+                activity.startActivity(intent);
+            }
+        });
+
     }
 
     @Override

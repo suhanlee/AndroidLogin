@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -44,7 +43,7 @@ import com.devsh.androidlogin.feed.model.FeedItem;
 import com.devsh.androidlogin.library.AndroidLogin;
 import com.devsh.androidlogin.library.data.SharedData;
 import com.devsh.androidlogin.library.server.ServiceGenerator;
-import com.facebook.login.LoginManager;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class FeedActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView mRecyclerView;
-    private MyRecyclerAdapter adapter;
+    private FeedRecyclerAdapter adapter;
 
     private SwipeRefreshLayout swipeLayout;
     private FeedService service;
@@ -184,7 +183,7 @@ public class FeedActivity extends AppCompatActivity
                     Feed feed = response.body();
                     List<FeedItem> items = feed.getFeed_list();
 
-                    adapter = new MyRecyclerAdapter(FeedActivity.this, items);
+                    adapter = new FeedRecyclerAdapter(FeedActivity.this, items);
                     mRecyclerView.setAdapter(adapter);
                     swipeLayout.setRefreshing(false);
                 }
