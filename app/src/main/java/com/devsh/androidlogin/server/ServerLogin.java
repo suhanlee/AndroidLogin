@@ -16,7 +16,7 @@
  *
  */
 
-package com.devsh.androidlogin.library.server;
+package com.devsh.androidlogin.server;
 
 import android.content.Context;
 import android.util.Log;

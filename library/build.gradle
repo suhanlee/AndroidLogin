@@ -31,9 +31,4 @@ dependencies {
     compile('com.twitter.sdk.android:twitter-core:1.6.8@aar') {
         transitive = true;
     }
-
-    // for server
-    compile 'com.squareup.retrofit2:retrofit:2.0.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.1.2'
 }

@@ -16,10 +16,18 @@
  *
  */
 
-package com.devsh.androidlogin.library.server;
+package com.devsh.androidlogin.sample;
 
-public class ServerLoginResponse {
-    boolean success;
-    String error_message;
-    String api_token;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+/**
+ * To work on unit tests, switch the Test Artifact in the Build Variants view.
+ */
+public class ExampleUnitTest {
+    @Test
+    public void addition_isCorrect() throws Exception {
+        assertEquals(4, 2 + 2);
+    }
 }

@@ -56,7 +56,7 @@ public class FacebookLoginUtil {
         void onCallback(AccessToken currentToken);
     }
 
-    public static FacebookLoginUtil getInstance() {
+    public static synchronized FacebookLoginUtil getInstance() {
         if (sInstance == null) {
             sInstance = new FacebookLoginUtil();
         }
@@ -84,6 +84,7 @@ public class FacebookLoginUtil {
                 }
 
                 if (oldAccessToken != null && currentAccessToken == null) {
+                    SharedData.clearSharedPreference(sContext);
                     logoutCallback.onCallback(currentAccessToken);
                 }
 
@@ -113,23 +114,28 @@ public class FacebookLoginUtil {
             public void onSuccess(LoginResult loginResult) {
                 Profile profile = Profile.getCurrentProfile();
 
-                SharedData.putAccountProvider(sContext, SharedData.PROVIDER_FACEBOOK);
-                SharedData.putAccountId(sContext, profile.getId());
-                SharedData.putAccountIdToken(sContext, loginResult.getAccessToken().getToken());
-                SharedData.putAccountUserName(sContext, profile.getName());
-                SharedData.putAccountUserPhoto(sContext, profile.getProfilePictureUri(200, 200).toString());
-                // No email
+                if (profile != null && SharedData.getAccountId(sContext) == null) {
+                    SharedData.putAccountProvider(sContext, SharedData.PROVIDER_FACEBOOK);
+                    SharedData.putAccountIdToken(sContext, loginResult.getAccessToken().getToken());
+                    SharedData.putAccountId(sContext, profile.getId());
+                    SharedData.putAccountUserName(sContext, profile.getName());
+                    SharedData.putAccountUserPhoto(sContext, profile.getProfilePictureUri(200, 200).toString());
+                    // No email
 
-                loginResultCallback.onSuccess(loginResult);
+                    loginResultCallback.onSuccess(loginResult);
+                }
+
             }
 
             @Override
             public void onCancel() {
+                SharedData.clearSharedPreference(sContext);
                 loginResultCallback.onCancel();
             }
 
             @Override
             public void onError(FacebookException error) {
+                SharedData.clearSharedPreference(sContext);
                 loginResultCallback.onError(error);
             }
         });

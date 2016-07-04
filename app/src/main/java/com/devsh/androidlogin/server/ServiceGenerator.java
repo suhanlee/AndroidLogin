@@ -16,10 +16,9 @@
  *
  */
 
-package com.devsh.androidlogin.library.server;
+package com.devsh.androidlogin.server;
 
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 

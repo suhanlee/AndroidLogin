@@ -42,8 +42,7 @@ import com.devsh.androidlogin.feed.model.Feed;
 import com.devsh.androidlogin.feed.model.FeedItem;
 import com.devsh.androidlogin.library.AndroidLogin;
 import com.devsh.androidlogin.library.data.SharedData;
-import com.devsh.androidlogin.library.server.ServiceGenerator;
-import com.google.gson.Gson;
+import com.devsh.androidlogin.server.ServiceGenerator;
 
 import java.util.List;
 

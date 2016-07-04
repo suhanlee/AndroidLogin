@@ -1,20 +1,36 @@
-package com.devsh.androidlogin;
+/*
+ *
+ *  Copyright (C) 2016 Suhan Lee
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
+package com.devsh.androidlogin.sample;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.devsh.androidlogin.library.AndroidLogin;
 import com.devsh.androidlogin.library.FacebookLoginUtil;
 import com.devsh.androidlogin.library.callback.GoogleLoginInResultCallback;
-import com.devsh.androidlogin.library.AndroidLogin;
-import com.devsh.androidlogin.library.data.SharedData;
-import com.devsh.androidlogin.server.ServerLogin;
-import com.devsh.androidlogin.server.ServerLoginResultCallback;
 import com.facebook.AccessToken;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -33,17 +49,15 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String TAG = "AndroidLogin";
-
+    private static final String TAG = "LoginSample";
     private LoginButton btnFacebookSignIn;
     private Button btnGoogleSignin;
     private TwitterLoginButton btnTwitterLogin;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ServerLogin.initialize(Common.API_BASE_URL);
         AndroidLogin.initialize(this,
                 getString(R.string.twitter_api_key),
                 getString(R.string.twitter_secret_key),
@@ -52,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (AndroidLogin.isLogined()) {
-            Intent intent = new Intent(MainActivity.this, FeedActivity.class);
-            AndroidLogin.loggined(this, intent);
+//
         }
 
         btnTwitterLogin = (TwitterLoginButton) findViewById(R.id.btnTwitterLogin);
@@ -63,11 +76,13 @@ public class MainActivity extends AppCompatActivity {
             public void success(Result<TwitterSession> result) {
                 tryLogin();
                 updateUI();
+                Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void failure(TwitterException exception) {
                 Log.d("TwitterKit", "Login with Twitter failure", exception);
+                Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -101,15 +116,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(GoogleSignInResult result) {
                 tryLogin();
-
                 updateUI();
+                Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onFail(GoogleSignInResult result) {
                 Log.i(TAG, "onFail: " + result);
-
                 updateUI();
+                Toast.makeText(getApplicationContext(), "fail", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -123,13 +138,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Facebook Login
-        // 1. LoginResultCallback
+        // LoginResultCallback
         AndroidLogin.setFacebookLoginResultCallback(new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.i(TAG, "onSuccess: " + loginResult);
                 tryLogin();
                 updateUI();
+                Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -142,10 +158,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(FacebookException error) {
                 Log.i(TAG, "onError: " + error);
-
+                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
             }
         });
-
 
         AndroidLogin.setFacebookLogoutResultCallback(new FacebookLoginUtil.Callback() {
             @Override
@@ -154,64 +169,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 2. Access Token method
-//        FacebookLoginUtil.getInstance().setLoginCallbackByAccessToken(new FacebookLoginUtil.Callback() {
-//            @Override
-//            public void onCallback(AccessToken currentToken) {
-//                Log.i(TAG, "onCallback: loginCallback");
-//            }
-//        });
-//
-//        FacebookLoginUtil.getInstance().setLogoutCallbackByAccessToken(new FacebookLoginUtil.Callback() {
-//            @Override
-//            public void onCallback(AccessToken currentToken) {
-//                Log.i(TAG, "onCallback: " + currentToken);
-//                updateUI();
-//            }
-//        });
-//
-//        FacebookLoginUtil.getInstance().setUpdateTokenCallbackByAccessToken(new FacebookLoginUtil.Callback() {
-//            @Override
-//            public void onCallback(AccessToken currentToken) {
-//                Log.i(TAG, "onCallback: updateTokenCallback");
-//            }
-//        });
 
         updateUI();
     }
 
-    public void tryLogin() {
-        Log.i(TAG, "id:" + SharedData.getAccountId(getApplicationContext()));
-        Log.i(TAG, "userName:" + SharedData.getAccountUserName(getApplicationContext()));
-        Log.i(TAG, "userEmail:" + SharedData.getAccountUserEmail(getApplicationContext()));
-        Log.i(TAG, "userPhoto:" + SharedData.getAccountUserPhoto(getApplicationContext()));
-        Log.i(TAG, "token:" + SharedData.getAccountIdToken(getApplicationContext()));
+    private void tryLogin() {
+        // trying... login
 
-        if (SharedData.getServerToken(getApplicationContext()) == null) {
-            // Try Login
-            ServerLogin.login(getApplicationContext(), new ServerLoginResultCallback() {
-                @Override
-                public void onSuccess(String apiToken) {
-                    SharedData.putServerToken(getApplicationContext(), apiToken);
-                    Intent intent = new Intent(MainActivity.this, FeedActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-
-                @Override
-                public void onFail(String error) {
-                    Log.i(TAG, "onFail : " + error);
-                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
-
-                }
-            });
-        } else {
-            // already token is there.
-            Log.i(TAG, "continues login");
-            Intent intent = new Intent(MainActivity.this, FeedActivity.class);
-            startActivity(intent);
-            finish();
-        }
     }
 
     public void updateUI() {
@@ -231,4 +195,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         AndroidLogin.onActivityResult(requestCode, resultCode, data);
     }
+
 }

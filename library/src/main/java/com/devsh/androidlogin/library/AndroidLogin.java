@@ -61,6 +61,10 @@ public class AndroidLogin {
             SharedData.putAccountProvider(sContext, SharedData.PROVIDER_TWITTER);
         }
 
+        if (SharedData.getAccountProvider(sContext) == null) {
+            return;
+        }
+
         switch (SharedData.getAccountProvider(sContext)) {
             case SharedData.PROVIDER_GOOGLE:
                 GoogleLoginUtil.getInstance().onActivityResult(requestCode, resultCode, data);

@@ -35,12 +35,17 @@ public class TwitterLoginUtil {
     private TwitterLoginButton loginButton;
     private Callback<TwitterSession> callback;
     private Context context;
+    private boolean requiredEmail;
 
     public static TwitterLoginUtil getInstance() {
         if (sInstance == null) {
             sInstance = new TwitterLoginUtil();
         }
         return sInstance;
+    }
+
+    private TwitterLoginUtil() {
+        requiredEmail = false;
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -60,14 +65,19 @@ public class TwitterLoginUtil {
 
                 SharedData.putAccountProvider(context, SharedData.PROVIDER_TWITTER);
                 SharedData.putAccountIdToken(context, session.getAuthToken().token);
-                SharedData.putAccountId(context, session.getUserId() +"");
+                SharedData.putAccountId(context, session.getUserId() + "");
                 SharedData.putAccountUserName(context, session.getUserName());
 
-                tryGetEmailAddress(session, result);
+                if (isRequiredEmail()) {
+                    tryGetEmailAddress(session, result);
+                } else {
+                    callback.success(result);
+                }
             }
             @Override
             public void failure(TwitterException exception) {
                 if (callback != null) {
+
                     callback.failure(exception);
                 }
             }
@@ -91,7 +101,7 @@ public class TwitterLoginUtil {
             @Override
             public void failure(TwitterException exception) {
                 if (callback != null) {
-                    callback.success(twitterSessionResult);
+                    callback.failure(exception);
                 }
             }
         });
@@ -100,4 +110,13 @@ public class TwitterLoginUtil {
     public void setCallback(Callback<TwitterSession> callback) {
         this.callback = callback;
     }
+
+    public boolean isRequiredEmail() {
+        return requiredEmail;
+    }
+
+    public void setRequiredEmail(boolean requiredEmail) {
+        this.requiredEmail = requiredEmail;
+    }
+
 }

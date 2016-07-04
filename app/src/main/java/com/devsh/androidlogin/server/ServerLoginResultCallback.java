@@ -16,8 +16,10 @@
  *
  */
 
-package com.devsh.androidlogin;
+package com.devsh.androidlogin.server;
 
-public class Common {
-    public static final String API_BASE_URL = "https://fingling-server.herokuapp.com";
+public interface ServerLoginResultCallback {
+    void onSuccess(String apiToken);
+    void onFail(String error);
 }
+
