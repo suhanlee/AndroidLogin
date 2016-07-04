@@ -1,9 +1,19 @@
 apply plugin: 'com.android.library'
 apply plugin: 'io.fabric'
+apply plugin: 'com.novoda.bintray-release'
 
 /*
     twitter sdk gradle references : https://fabric.io/kits/android/twitterkit/install
  */
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.4'
+    }
+}
 
 android {
     compileSdkVersion 23
@@ -13,13 +23,17 @@ android {
         minSdkVersion 16
         targetSdkVersion 21
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -31,4 +45,15 @@ dependencies {
     compile('com.twitter.sdk.android:twitter-core:1.6.8@aar') {
         transitive = true;
     }
+}
+
+publish {
+    userOrg = 'suhanlee'
+    groupId = 'com.devsh.androidlogin'
+    artifactId = 'android-login'
+    publishVersion = '0.0.1'
+    desc = 'Android social login library including facebook, google+, twitter'
+    website = 'https://github.com/suhanlee/AndroidLogin'
+    issueTracker = "${website}/issues"
+    repository = "${website}.git"
 }

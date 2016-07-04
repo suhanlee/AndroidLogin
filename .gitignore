@@ -9,3 +9,6 @@
 .idea
 app/google-services.json
 library/fabric.properties
+fabric.properties
+upload.sh
+
