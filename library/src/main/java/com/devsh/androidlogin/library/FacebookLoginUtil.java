@@ -21,6 +21,7 @@ package com.devsh.androidlogin.library;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.devsh.androidlogin.library.data.SharedData;
@@ -30,11 +31,16 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -113,18 +119,49 @@ public class FacebookLoginUtil {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Profile profile = Profile.getCurrentProfile();
-
-                if (profile != null && SharedData.getAccountId(sContext) == null) {
+                final AccessToken accessToken = loginResult.getAccessToken();
+                if (profile != null) {
                     SharedData.putAccountProvider(sContext, SharedData.PROVIDER_FACEBOOK);
-                    SharedData.putAccountIdToken(sContext, loginResult.getAccessToken().getToken());
+                    SharedData.putAccountIdToken(sContext, accessToken.getToken());
                     SharedData.putAccountId(sContext, profile.getId());
                     SharedData.putAccountUserName(sContext, profile.getName());
                     SharedData.putAccountUserPhoto(sContext, profile.getProfilePictureUri(200, 200).toString());
                     // No email
 
                     loginResultCallback.onSuccess(loginResult);
-                }
+                } else {
+                    final LoginResult loginResult2 = loginResult;
+                    GraphRequest request = GraphRequest.newMeRequest(
+                            accessToken,
+                            new GraphRequest.GraphJSONObjectCallback() {
+                                @Override
+                                public void onCompleted(
+                                        JSONObject object,
+                                        GraphResponse response) {
 
+                                    SharedData.putAccountProvider(sContext, SharedData.PROVIDER_FACEBOOK);
+                                    SharedData.putAccountIdToken(sContext, accessToken.getToken());
+                                    SharedData.putAccountId(sContext, accessToken.getUserId());
+
+                                    try {
+                                        String userName = response.getJSONObject().getString("name");
+                                        String userPhoto = object.getJSONObject("picture").getJSONObject("data").getString("url");
+                                        String userEmail = object.getString("email");
+                                        SharedData.putAccountUserName(sContext, userName);
+                                        SharedData.putAccountUserPhoto(sContext, userPhoto);
+                                        SharedData.putAccountUserEmail(sContext, userEmail);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    loginResultCallback.onSuccess(loginResult2);
+                                }
+                            });
+                    Bundle parameters = new Bundle();
+                    parameters.putString("fields", "id,name,email,picture");
+                    request.setParameters(parameters);
+                    request.executeAsync();
+                }
             }
 
             @Override

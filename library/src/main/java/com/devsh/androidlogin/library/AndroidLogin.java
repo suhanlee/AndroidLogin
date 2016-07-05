@@ -99,6 +99,11 @@ public class AndroidLogin {
         FacebookLoginUtil.initialize(context);
     }
 
+    public static void initialize2(Context context) {
+        sContext = context;
+        FacebookLoginUtil.initialize(context);
+    }
+
     public static void loginWithGoogle(Activity activity) {
         SharedData.putAccountProvider(activity, SharedData.PROVIDER_GOOGLE);
         GoogleLoginUtil.getInstance().signIn(activity);

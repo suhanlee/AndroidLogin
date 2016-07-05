@@ -32,6 +32,7 @@ import com.devsh.androidlogin.library.AndroidLogin;
 import com.devsh.androidlogin.library.FacebookLoginUtil;
 import com.devsh.androidlogin.library.callback.GoogleLoginInResultCallback;
 import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
@@ -50,7 +51,7 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginSample";
-    private LoginButton btnFacebookSignIn;
+    private Button btnFacebookSignIn;
     private Button btnGoogleSignin;
     private TwitterLoginButton btnTwitterLogin;
 
@@ -98,18 +99,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnFacebookSignIn = (LoginButton) findViewById(R.id.btnFacebookSignIn);
+        btnFacebookSignIn = (Button) findViewById(R.id.btnFacebookSignIn);
         btnFacebookSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (AndroidLogin.isLoginedWithFacebook()) {
                     AndroidLogin.logoutWithFacebook();
                 } else {
-                    AndroidLogin.loginWithFacebook(MainActivity.this, Arrays.asList("user_status"));
+                    AndroidLogin.loginWithFacebook(MainActivity.this, Arrays.asList("public_profile"));
                 }
             }
         });
-
 
         // Google Login
         AndroidLogin.setGoogleLoginResultCallback(new GoogleLoginInResultCallback() {
@@ -186,6 +186,12 @@ public class MainActivity extends AppCompatActivity {
                     btnGoogleSignin.setText("Google Logout");
                 } else {
                     btnGoogleSignin.setText("Google Login");
+                }
+
+                if (AndroidLogin.isLogined()) {
+                    btnFacebookSignIn.setText("Facebook Logout");
+                } else {
+                    btnFacebookSignIn.setText("Facebook Login");
                 }
             }
         });

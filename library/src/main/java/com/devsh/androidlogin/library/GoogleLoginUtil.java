@@ -112,8 +112,7 @@ public class GoogleLoginUtil {
 
     public boolean isSignedIn(Context context) {
         return SharedData.getAccountId(context) != null
-                && SharedData.getAccountIdToken(context) != null
-                && SharedData.isLoggedIn(context);
+                && SharedData.getAccountIdToken(context) != null;
     }
 
     public void signIn(Activity activity) {

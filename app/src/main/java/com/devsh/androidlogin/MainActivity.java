@@ -1,9 +1,13 @@
 package com.devsh.androidlogin;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,19 +33,38 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
     private String TAG = "AndroidLogin";
 
-    private LoginButton btnFacebookSignIn;
+    private Button btnFacebookSignIn;
     private Button btnGoogleSignin;
     private TwitterLoginButton btnTwitterLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Add code to print out the key hash
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(
+                    "com.devsh.androidlogin",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+
+        } catch (NoSuchAlgorithmException e) {
+
+        }
+
 
         ServerLogin.initialize(Common.API_BASE_URL);
         AndroidLogin.initialize(this,
@@ -83,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnFacebookSignIn = (LoginButton) findViewById(R.id.btnFacebookSignIn);
+        btnFacebookSignIn = (Button) findViewById(R.id.btnFacebookSignIn);
         btnFacebookSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -154,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 2. Access Token method
+//        // 2. Access Token method
 //        FacebookLoginUtil.getInstance().setLoginCallbackByAccessToken(new FacebookLoginUtil.Callback() {
 //            @Override
 //            public void onCallback(AccessToken currentToken) {
@@ -222,6 +245,12 @@ public class MainActivity extends AppCompatActivity {
                     btnGoogleSignin.setText("Google Logout");
                 } else {
                     btnGoogleSignin.setText("Google Login");
+                }
+
+                if (AndroidLogin.isLogined()) {
+                    btnFacebookSignIn.setText("Facebook Logout");
+                } else {
+                    btnFacebookSignIn.setText("Facebook Login");
                 }
             }
         });
