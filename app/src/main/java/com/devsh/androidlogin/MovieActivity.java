@@ -120,12 +120,14 @@ public class MovieActivity extends Activity {
 
             @Override
             public void onResponse(Call<CommentServiceResponse> call, Response<CommentServiceResponse> response) {
+                CommentServiceResponse body = response.body();
                 if (response.isSuccessful()) {
-                    CommentServiceResponse body = response.body();
                     if (body.getSuccess()) {
                         Toast.makeText(getApplicationContext(), "Post comment", Toast.LENGTH_LONG).show();
                         getMovieDataFromServer(feedItem.getMovieId());
                     }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Error: Post Comment ", Toast.LENGTH_LONG).show();
                 }
             }
 

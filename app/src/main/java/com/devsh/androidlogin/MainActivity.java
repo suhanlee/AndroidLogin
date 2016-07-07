@@ -75,9 +75,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (AndroidLogin.isLogined()) {
-            Intent intent = new Intent(MainActivity.this, FeedActivity.class);
-            AndroidLogin.loggined(this, intent);
-            finish();
+            tryLogin();
         }
 
         btnTwitterLogin = (TwitterLoginButton) findViewById(R.id.btnTwitterLogin);
@@ -211,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "userPhoto:" + SharedData.getAccountUserPhoto(getApplicationContext()));
         Log.i(TAG, "token:" + SharedData.getAccountIdToken(getApplicationContext()));
 
-        if (SharedData.getServerToken(getApplicationContext()) == null) {
             // Try Login
             ServerLogin.login(getApplicationContext(), new ServerLoginResultCallback() {
                 @Override
@@ -229,13 +226,6 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-        } else {
-            // already token is there.
-            Log.i(TAG, "continues login");
-            Intent intent = new Intent(MainActivity.this, FeedActivity.class);
-            startActivity(intent);
-            finish();
-        }
     }
 
     public void updateUI() {
