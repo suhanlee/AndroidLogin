@@ -19,12 +19,18 @@
 package com.devsh.androidlogin.feed;
 
 import com.devsh.androidlogin.feed.model.Feed;
+import com.devsh.androidlogin.feed.model.FeedItem;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface FeedService {
 
     @GET("/feed.json")
     Call<Feed> getFeeds();
+
+    @GET("/feed/{movieId}.json")
+    Call<FeedItem> getFeedItems(@Path("movieId") String movieId, @Query("api_key") String apiKey);
 }

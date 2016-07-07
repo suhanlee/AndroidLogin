@@ -19,41 +19,54 @@
 package com.devsh.androidlogin.movie;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.devsh.androidlogin.MovieActivity;
+import com.devsh.androidlogin.Common;
 import com.devsh.androidlogin.R;
 import com.devsh.androidlogin.feed.model.Comment;
-import com.devsh.androidlogin.feed.model.FeedItem;
-import com.google.gson.Gson;
+import com.devsh.androidlogin.library.data.SharedData;
+import com.devsh.androidlogin.server.ServiceGenerator;
 
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecyclerAdapter.CustomViewHolder> {
-    private final List<Comment> commentList;
+    private final String movieId;
+    private List<Comment> commentList;
 
     private Activity activity;
+    private ServerUpdateCallback serverUpdateCallback;
 
-    public CommentsRecyclerAdapter(Activity activity, List<Comment> commentList) {
+    public CommentsRecyclerAdapter(Activity activity, String movieId, List<Comment> commentList) {
+        this.movieId = movieId;
         this.activity = activity;
         this.commentList = commentList;
     }
 
+    public void setCommentList(List<Comment> commentList) {
+        this.commentList = commentList;
+        notifyDataSetChanged();
+    }
+
+    public void setUpdateCallback(ServerUpdateCallback callback) {
+        this.serverUpdateCallback = callback;
+    }
+
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-//        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.feed_list_row, viewGroup, false);
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.movie_comments_list_row, viewGroup, false);
         CustomViewHolder viewHolder = new CustomViewHolder(view);
         return viewHolder;
@@ -62,7 +75,7 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
     @Override
     public void onBindViewHolder(CustomViewHolder customViewHolder, int i) {
 
-        Comment comment = commentList.get(i);
+        final Comment comment = commentList.get(i);
 
         // Author Name
         customViewHolder.authorName.setText(comment.getUsername());
@@ -77,6 +90,19 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
                 .bitmapTransform(new CropCircleTransformation(activity))
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(customViewHolder.authorImage);
+
+        // Delete Button
+        if (comment.getOwner()) {
+            customViewHolder.deleteButton.setVisibility(View.VISIBLE);
+            customViewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteComment(comment.getId());
+                }
+            });
+        } else {
+            customViewHolder.deleteButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -95,12 +121,42 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
         protected TextView authorMessage;
 
         protected ImageView authorImage;
+        protected Button deleteButton;
 
         public CustomViewHolder(View view) {
             super(view);
             this.authorName = (TextView) view.findViewById(R.id.author_name);
             this.authorImage = (ImageView) view.findViewById(R.id.author_image);
             this.authorMessage = (TextView) view.findViewById(R.id.author_message);
+            this.deleteButton = (Button) view.findViewById(R.id.btn_delete_comment);
         }
     }
+
+
+    private void deleteComment(String commentId) {
+        CommentService service = ServiceGenerator.createService(Common.API_BASE_URL, CommentService.class);
+
+        Call<CommentServiceResponse> call = service.deleteComment(commentId, SharedData.getServerToken(activity));
+        call.enqueue(new Callback<CommentServiceResponse>() {
+            @Override
+            public void onResponse(Call<CommentServiceResponse> call, Response<CommentServiceResponse> response) {
+                if (response.isSuccessful()) {
+                    CommentServiceResponse body = response.body();
+                    if (body.getSuccess()) {
+                        Toast.makeText(activity, "Delete Comment", Toast.LENGTH_LONG).show();
+                        if (serverUpdateCallback != null) {
+                            serverUpdateCallback.onSuccess();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommentServiceResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
+
 }

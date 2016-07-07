@@ -54,6 +54,16 @@ public class AndroidLogin {
         if (SharedData.getAccountProvider(activity).equals(SharedData.PROVIDER_GOOGLE)) {
             GoogleLoginUtil.getInstance().signIn(activity);
         }
+
+        if (SharedData.getAccountProvider(activity).equals(SharedData.PROVIDER_FACEBOOK)) {
+
+        }
+
+        if (SharedData.getAccountProvider(activity).equals(SharedData.PROVIDER_TWITTER)) {
+
+        }
+
+        activity.startActivity(intent);
     }
 
     public static void onActivityResult(int requestCode, int resultCode, Intent data) {

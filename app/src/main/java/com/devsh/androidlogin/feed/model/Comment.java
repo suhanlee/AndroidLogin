@@ -19,9 +19,15 @@
 package com.devsh.androidlogin.feed.model;
 
 public class Comment {
+    private String id;
     private String username;
     private String user_profile_image_url;
     private String user_message;
+    private boolean owner;
+
+    public String getId() {
+        return id;
+    }
 
     public String getUsername() {
         return username;
@@ -34,4 +40,9 @@ public class Comment {
     public String getUser_message() {
         return user_message;
     }
+
+    public boolean getOwner() {
+        return owner;
+    }
+
 }

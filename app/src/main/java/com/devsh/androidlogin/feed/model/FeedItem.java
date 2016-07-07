@@ -21,6 +21,7 @@ package com.devsh.androidlogin.feed.model;
 import java.util.List;
 
 public class FeedItem {
+    private String movie_id;
     private String title;
     private String movie_url;
     private String thumb_movie_url;
@@ -28,6 +29,10 @@ public class FeedItem {
     private Author author;
     private Feedback feedback;
     private List<Comment> comments;
+
+    public String getMovieId() {
+        return movie_id;
+    }
 
     public String getTitle() {
         return title;

@@ -95,9 +95,10 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             public void onClick(View v) {
                 Intent intent = new Intent(activity, MovieActivity.class);
                 Bundle bundle = new Bundle();
-                String json = (new Gson()).toJson(feedItem);
 
+                String json = (new Gson()).toJson(feedItem);
                 bundle.putString(FEED_ITEM_KEY, json);
+
                 intent.putExtras(bundle);
 
                 activity.startActivity(intent);

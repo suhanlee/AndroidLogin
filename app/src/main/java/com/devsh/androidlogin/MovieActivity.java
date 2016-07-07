@@ -19,24 +19,43 @@
 package com.devsh.androidlogin;
 
 import android.app.Activity;
+import android.app.Service;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.devsh.androidlogin.feed.FeedService;
 import com.devsh.androidlogin.feed.model.FeedItem;
+import com.devsh.androidlogin.library.data.SharedData;
+import com.devsh.androidlogin.movie.CommentService;
+import com.devsh.androidlogin.movie.CommentServiceResponse;
 import com.devsh.androidlogin.movie.CommentsRecyclerAdapter;
+import com.devsh.androidlogin.movie.ServerUpdateCallback;
+import com.devsh.androidlogin.server.ServiceGenerator;
+import com.devsh.androidlogin.upload.ResourceUploadResponse;
+import com.devsh.androidlogin.upload.ResourceUploadService;
 import com.google.gson.Gson;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MovieActivity extends Activity {
     private FeedItem feedItem;
     private CommentsRecyclerAdapter adapter;
+    private TextView txtTitle;
+    private VideoView movieView;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +66,18 @@ public class MovieActivity extends Activity {
         Gson gson = new Gson();
         feedItem = gson.fromJson(temp, FeedItem.class);
 
+        getFeedItem(feedItem.getMovieId());
+
         initializeUI();
     }
 
     private void initializeUI() {
-        TextView txtTitle = (TextView) findViewById(R.id.txt_title);
+        txtTitle = (TextView) findViewById(R.id.txt_title);
         txtTitle.setText(feedItem.getTitle());
 
-        VideoView movieView = (VideoView) findViewById(R.id.movie_view);
+        final EditText editComment = (EditText) findViewById(R.id.edit_comment);
+
+        movieView = (VideoView) findViewById(R.id.movie_view);
         movieView.setVideoURI(Uri.parse(feedItem.getMovie_url()));
         movieView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -64,20 +87,80 @@ public class MovieActivity extends Activity {
         });
         movieView.start();
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.comments_recycler_view);
+        recyclerView = (RecyclerView) findViewById(R.id.comments_recycler_view);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setHasFixedSize(true);
 
-        adapter = new CommentsRecyclerAdapter(MovieActivity.this, feedItem.getComments());
+        adapter = new CommentsRecyclerAdapter(MovieActivity.this, feedItem.getMovieId(), feedItem.getComments());
+        adapter.setUpdateCallback(new ServerUpdateCallback() {
+                                      @Override
+                                      public void onSuccess() {
+                                        getMovieDataFromServer(feedItem.getMovieId());
+                                      }
+                                  });
+
+
         recyclerView.setAdapter(adapter);
 
         Button btnSubmit = (Button) findViewById(R.id.btn_submit);
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                postComment(editComment.getText().toString());
+            }
+        });
+    }
+
+    private void postComment(String message) {
+        CommentService service = ServiceGenerator.createService(Common.API_BASE_URL, CommentService.class);
+
+        Call<CommentServiceResponse> call = service.postComment(SharedData.getServerToken(getApplicationContext()), feedItem.getMovieId(), message);
+        call.enqueue(new Callback<CommentServiceResponse>() {
+
+            @Override
+            public void onResponse(Call<CommentServiceResponse> call, Response<CommentServiceResponse> response) {
+                if (response.isSuccessful()) {
+                    CommentServiceResponse body = response.body();
+                    if (body.getSuccess()) {
+                        Toast.makeText(getApplicationContext(), "Post comment", Toast.LENGTH_LONG).show();
+                        getMovieDataFromServer(feedItem.getMovieId());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommentServiceResponse> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "fail", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void getMovieDataFromServer(String movieId) {
+        FeedService service = ServiceGenerator.createService(Common.API_BASE_URL, FeedService.class);
+
+        Call<FeedItem> call = service.getFeedItems(movieId, SharedData.getServerToken(getApplicationContext()));
+        call.enqueue(new Callback<FeedItem>() {
+            @Override
+            public void onResponse(Call<FeedItem> call, Response<FeedItem> response) {
+                if (response.isSuccessful()) {
+                    FeedItem feedItem = response.body();
+                    updateMovieDetail(feedItem);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FeedItem> call, Throwable t) {
 
             }
         });
+    }
+
+    private void updateMovieDetail(FeedItem feedItem) {
+        adapter.setCommentList(feedItem.getComments());
+    }
+
+    public void getFeedItem(String movieId) {
+        getMovieDataFromServer(movieId);
     }
 }

@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         if (AndroidLogin.isLogined()) {
             Intent intent = new Intent(MainActivity.this, FeedActivity.class);
             AndroidLogin.loggined(this, intent);
+            finish();
         }
 
         btnTwitterLogin = (TwitterLoginButton) findViewById(R.id.btnTwitterLogin);

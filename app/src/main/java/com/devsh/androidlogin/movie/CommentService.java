@@ -18,16 +18,23 @@
 
 package com.devsh.androidlogin.movie;
 
-import com.devsh.androidlogin.feed.model.Feed;
-
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface CommentService {
 
     @POST("/android/comment.json")
-    Call<Feed> postComment(@Field("api_token") String api_token,
+    @FormUrlEncoded
+    Call<CommentServiceResponse> postComment(@Field("api_token") String api_token,
                            @Field("comment[movie_id]") String movieId,
                            @Field("comment[message]") String message);
+
+    @DELETE("/android/comment/{commentId}.json")
+    Call<CommentServiceResponse> deleteComment(@Path("commentId") String commentId, @Query("api_token") String api_token);
+
 }

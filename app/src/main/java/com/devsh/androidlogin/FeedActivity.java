@@ -84,7 +84,6 @@ public class FeedActivity extends AppCompatActivity
         toggle.syncState();
 
 
-
         initializeNavigationView();
 
         // Initialize service
@@ -134,7 +133,7 @@ public class FeedActivity extends AppCompatActivity
         }
 
         String userProfileEmail = SharedData.getAccountUserEmail(getApplicationContext());
-        TextView profileEmailView = (TextView) headerView.findViewById(R.id.txtProfileEmail);
+        TextView profileEmailView = (TextView) headerView.findViewById(R.id.txt_profile_email);
         if (userProfileEmail != null) {
             profileEmailView.setText(userProfileEmail);
         }
