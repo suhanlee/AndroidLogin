@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFail(GoogleSignInResult result) {
-                Log.i(TAG, "onFail: " + result);
+                Log.i(TAG, "onFail: " + result.getStatus());
                 updateUI();
                 Toast.makeText(getApplicationContext(), "fail", Toast.LENGTH_LONG).show();
             }

@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "486150556496",
+    "project_id": "eminent-monitor-122607"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486150556496:android:56c1480ffcafd2aa",
+        "android_client_info": {
+          "package_name": "com.devsh.googlelogin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "486150556496-50aqprnvgq83oipm5erijsn40u77ngk1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx9edScZGXbV1K31n_I-Ch5oCWSRoJ5Vs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486150556496:android:269d0afb63d4f095",
+        "android_client_info": {
+          "package_name": "com.devsh.androidlogin.sample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "486150556496-o6g7npm0qjbc5ijvat9orfh7q0llnofj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devsh.androidlogin.sample",
+            "certificate_hash": "D3A80027F1273C84C4FBC8BE57A5A68C1266D8DD"
+          }
+        },
+        {
+          "client_id": "486150556496-50aqprnvgq83oipm5erijsn40u77ngk1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [ {
+        "current_key": "AIzaSyAx9edScZGXbV1K31n_I-Ch5oCWSRoJ5Vs"
+      }],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

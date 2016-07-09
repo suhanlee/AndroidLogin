@@ -66,7 +66,7 @@ public class GoogleLoginUtil {
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestProfile()
                 .requestEmail()
-                .requestIdToken(sServerClientID)
+                .requestIdToken(sServerClientID)            // for userIdToken
                 .build();
     }
 
