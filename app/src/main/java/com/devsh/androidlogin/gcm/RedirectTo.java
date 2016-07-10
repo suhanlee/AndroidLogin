@@ -16,8 +16,9 @@
  *
  */
 
-package com.devsh.androidlogin;
+package com.devsh.androidlogin.gcm;
 
-public class Common {
-    public static final String API_BASE_URL = "http://192.168.0.6:3000";
+public class RedirectTo {
+    public String movie_id;
+    public String comment_id;
 }

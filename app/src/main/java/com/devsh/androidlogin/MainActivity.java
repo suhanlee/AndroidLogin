@@ -1,10 +1,16 @@
 package com.devsh.androidlogin;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -13,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.devsh.androidlogin.gcm.RegistrationIntentService;
 import com.devsh.androidlogin.library.FacebookLoginUtil;
 import com.devsh.androidlogin.library.callback.GoogleLoginInResultCallback;
 import com.devsh.androidlogin.library.AndroidLogin;
@@ -25,6 +32,8 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.twitter.sdk.android.core.Callback;
@@ -44,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
     private Button btnFacebookSignIn;
     private Button btnGoogleSignin;
     private TwitterLoginButton btnTwitterLogin;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+
+    private int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (NoSuchAlgorithmException e) {
 
         }
-
 
         ServerLogin.initialize(Common.API_BASE_URL);
         AndroidLogin.initialize(this,
@@ -202,6 +213,13 @@ public class MainActivity extends AppCompatActivity {
         updateUI();
     }
 
+    private void setUpPush() {
+        if (checkPlayServices()) {
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
+    }
+
     public void tryLogin() {
         Log.i(TAG, "id:" + SharedData.getAccountId(getApplicationContext()));
         Log.i(TAG, "userName:" + SharedData.getAccountUserName(getApplicationContext()));
@@ -214,6 +232,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(String apiToken) {
                     SharedData.putServerToken(getApplicationContext(), apiToken);
+                    setUpPush();
+
                     Intent intent = new Intent(MainActivity.this, FeedActivity.class);
                     startActivity(intent);
                     finish();
@@ -251,4 +271,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         AndroidLogin.onActivityResult(requestCode, resultCode, data);
     }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not suppored");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+
 }

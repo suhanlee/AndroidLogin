@@ -16,8 +16,19 @@
  *
  */
 
-package com.devsh.androidlogin;
+package com.devsh.androidlogin.gcm.network;
 
-public class Common {
-    public static final String API_BASE_URL = "http://192.168.0.6:3000";
+public class GCMRequest {
+    String api_token;
+    String registration_token;
+    String version_name;
+    String version_code;
+
+
+    public GCMRequest(String api_token, String registration_token, String version_name, String version_code) {
+        this.api_token = api_token;
+        this.registration_token = registration_token;
+        this.version_name = version_name;
+        this.version_code = version_code;
+    }
 }
