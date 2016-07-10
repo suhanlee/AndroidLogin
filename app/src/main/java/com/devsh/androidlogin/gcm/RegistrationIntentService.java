@@ -27,9 +27,9 @@ import android.util.Log;
 
 import com.devsh.androidlogin.Common;
 import com.devsh.androidlogin.R;
-import com.devsh.androidlogin.gcm.network.GCMRegistration;
+import com.devsh.androidlogin.gcm.network.GCMServiceController;
 import com.devsh.androidlogin.gcm.network.GCMRegistrationCallback;
-import com.devsh.androidlogin.gcm.network.GCMResponse;
+import com.devsh.androidlogin.gcm.network.GCMServiceResponse;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
@@ -65,17 +65,17 @@ public class RegistrationIntentService extends IntentService {
 
             Log.i(TAG, "instanceId token:" + token);
 
-            GCMRegistration.initialize(Common.API_BASE_URL);
-            GCMRegistration.registerToken(getApplicationContext(), token, new GCMRegistrationCallback() {
+            GCMServiceController.initialize(Common.API_BASE_URL);
+            GCMServiceController.registerToken(getApplicationContext(), token, new GCMRegistrationCallback() {
                 @Override
-                public void onResponseSuccess(GCMResponse result) {
+                public void onResponseSuccess(GCMServiceResponse result) {
 
                     Log.i(TAG, "Success");
                     // Subscribe to topic channels
                 }
 
                 @Override
-                public void onFailure(Call<GCMResponse> call, Throwable t) {
+                public void onFailure(Call<GCMServiceResponse> call, Throwable t) {
 
                 }
             });

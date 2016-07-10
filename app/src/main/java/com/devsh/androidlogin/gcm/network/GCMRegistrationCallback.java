@@ -21,6 +21,6 @@ package com.devsh.androidlogin.gcm.network;
 import retrofit2.Call;
 
 public interface GCMRegistrationCallback {
-    void onResponseSuccess(GCMResponse result);
-    void onFailure(Call<GCMResponse> call, Throwable t);
+    void onResponseSuccess(GCMServiceResponse result);
+    void onFailure(Call<GCMServiceResponse> call, Throwable t);
 }

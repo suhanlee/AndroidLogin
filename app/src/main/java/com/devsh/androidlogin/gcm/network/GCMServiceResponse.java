@@ -18,17 +18,12 @@
 
 package com.devsh.androidlogin.gcm.network;
 
-public class GCMRequest {
-    String api_token;
-    String registration_token;
-    String version_name;
-    String version_code;
+public class GCMServiceResponse {
+    boolean result;
+    boolean duplicate;
+    boolean token;
 
-
-    public GCMRequest(String api_token, String registration_token, String version_name, String version_code) {
-        this.api_token = api_token;
-        this.registration_token = registration_token;
-        this.version_name = version_name;
-        this.version_code = version_code;
+    public boolean getDuplicate() {
+        return duplicate;
     }
 }

@@ -18,14 +18,11 @@
 
 package com.devsh.androidlogin.gcm.network;
 
-import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.util.Log;
 
 import com.devsh.androidlogin.DeviceUtil;
 import com.devsh.androidlogin.library.data.SharedData;
-
-import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -35,7 +32,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class GCMRegistration {
+public class GCMServiceController {
     public static boolean DEBUG = true;
 
     private static Retrofit sRetrofit;
@@ -58,18 +55,18 @@ public class GCMRegistration {
     }
 
     public static void registerToken(Context context, String registration_token, final GCMRegistrationCallback callback) {
-        GCMRequest gcmRequest = new GCMRequest(
+        GCMServiceRequest gcmRequest = new GCMServiceRequest(
                 SharedData.getServerToken(context),
                 registration_token,
                 DeviceUtil.getVersionName(context),
                 DeviceUtil.getVersionCode(context));
 
-        Call<GCMResponse> response = service.registerToken(gcmRequest);
-        response.enqueue(new Callback<GCMResponse>() {
+        Call<GCMServiceResponse> response = service.registerToken(gcmRequest);
+        response.enqueue(new Callback<GCMServiceResponse>() {
             @Override
-            public void onResponse(Call<GCMResponse> call, Response<GCMResponse> response) {
+            public void onResponse(Call<GCMServiceResponse> call, Response<GCMServiceResponse> response) {
                 if (response.isSuccessful()) {
-                    GCMResponse result = response.body();
+                    GCMServiceResponse result = response.body();
 
                     if (DEBUG) {
                         Log.d(TAG, "response.isSuccess() == true");
@@ -81,7 +78,7 @@ public class GCMRegistration {
             }
 
             @Override
-            public void onFailure(Call<GCMResponse> call, Throwable t) {
+            public void onFailure(Call<GCMServiceResponse> call, Throwable t) {
                 if (DEBUG) {
                     Log.d(TAG, "onFailure");
                 }
@@ -91,7 +88,7 @@ public class GCMRegistration {
         });
     }
 
-    private static void printResponse(GCMResponse result) {
+    private static void printResponse(GCMServiceResponse result) {
         Log.i(TAG, "duplicate:" + result.getDuplicate());
     }
 }

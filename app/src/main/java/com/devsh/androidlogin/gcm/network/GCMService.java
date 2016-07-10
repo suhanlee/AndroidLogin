@@ -24,5 +24,5 @@ import retrofit2.http.POST;
 
 public interface GCMService {
     @POST("gcm/register")
-    Call<GCMResponse> registerToken(@Body GCMRequest body);
+    Call<GCMServiceResponse> registerToken(@Body GCMServiceRequest body);
 }
