@@ -26,7 +26,7 @@ public interface ResourceUploadService {
 
     @Multipart
     @POST("/android/upload.json")
-    Call<ResourceUploadResponse> uploadImage(@PartMap Map<String, RequestBody> map);
+    Call<ResourceUploadServiceResponse> uploadImage(@PartMap Map<String, RequestBody> map);
 
 
 }

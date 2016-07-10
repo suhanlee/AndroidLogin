@@ -24,12 +24,12 @@ import retrofit2.http.Query;
 public interface ServerLoginService {
 
     @GET("/android/login")
-    Call<ServerLoginResponse> login(@Query("provider") String provider,
-                                    @Query("token") String token,
-                                    @Query("uid") String uid,
-                                    @Query("userName") String username,
-                                    @Query("userEmail") String userEmail,
-                                    @Query("userPhoto") String userPhoto);
+    Call<ServerLoginServiceResponse> login(@Query("provider") String provider,
+                                           @Query("token") String token,
+                                           @Query("uid") String uid,
+                                           @Query("userName") String username,
+                                           @Query("userEmail") String userEmail,
+                                           @Query("userPhoto") String userPhoto);
 
 
 }

@@ -32,7 +32,7 @@ package com.devsh.androidlogin.upload;/*
  * limitations under the License.
  */
 
-public class ResourceUploadResponse {
+public class ResourceUploadServiceResponse {
     private String id;
     private String movie_url;
     private String thumb_url;

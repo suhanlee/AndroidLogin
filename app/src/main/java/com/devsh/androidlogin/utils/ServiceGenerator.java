@@ -16,7 +16,7 @@
  *
  */
 
-package com.devsh.androidlogin.server;
+package com.devsh.androidlogin.utils;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;

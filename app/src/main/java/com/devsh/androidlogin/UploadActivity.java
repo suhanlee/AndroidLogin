@@ -32,8 +32,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.devsh.androidlogin.upload.ProgressRequestBody;
-import com.devsh.androidlogin.upload.ResourceUploadResponse;
-import com.devsh.androidlogin.upload.UploadStorage;
+import com.devsh.androidlogin.upload.ResourceUploadServiceResponse;
+import com.devsh.androidlogin.upload.ResourceUploadServiceController;
 import com.devsh.androidlogin.upload.gallery.VideoGalleryAdapter;
 import com.devsh.androidlogin.upload.gallery.VideoItem;
 
@@ -101,7 +101,7 @@ public class UploadActivity extends MainActivity {
 
         for(VideoItem item : mItems) {
             if (item.isImage()) {
-                UploadStorage.uploadImageFile(getApplicationContext(), new File(item.getThumbnailPath()), title, new ProgressRequestBody.UploadCallbacks() {
+                ResourceUploadServiceController.uploadImageFile(getApplicationContext(), new File(item.getThumbnailPath()), title, new ProgressRequestBody.UploadCallbacks() {
                     @Override
                     public void onProgressUpdate(int percentage) {
                         progressDialog.setProgress(percentage);
@@ -114,7 +114,7 @@ public class UploadActivity extends MainActivity {
                     }
 
                     @Override
-                    public void onFinish(ResourceUploadResponse body) {
+                    public void onFinish(ResourceUploadServiceResponse body) {
                         progressDialog.setProgress(100);
                         progressDialog.dismiss();
                         Toast.makeText(UploadActivity.this, body.getMovie_url(), Toast.LENGTH_LONG).show();

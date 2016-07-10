@@ -21,9 +21,9 @@ package com.devsh.androidlogin.upload;
 import android.content.Context;
 import android.util.Log;
 
-import com.devsh.androidlogin.Common;
+import com.devsh.androidlogin.common.Common;
 import com.devsh.androidlogin.library.data.SharedData;
-import com.devsh.androidlogin.server.ServiceGenerator;
+import com.devsh.androidlogin.utils.ServiceGenerator;
 
 import java.io.File;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UploadStorage {
+public class ResourceUploadServiceController {
 
     private static String TAG = "UploadStorage";
 
@@ -54,19 +54,19 @@ public class UploadStorage {
         map.put("movie[title]", title);
         map.put("movie[upload]" + "\"; filename=" + file.getName().trim(), upload);
 
-        Call<ResourceUploadResponse> call = service.uploadImage(map);
-        call.enqueue(new Callback<ResourceUploadResponse>() {
+        Call<ResourceUploadServiceResponse> call = service.uploadImage(map);
+        call.enqueue(new Callback<ResourceUploadServiceResponse>() {
             @Override
-            public void onResponse(Call<ResourceUploadResponse> call, Response<ResourceUploadResponse> response) {
+            public void onResponse(Call<ResourceUploadServiceResponse> call, Response<ResourceUploadServiceResponse> response) {
                 if (response.isSuccessful()) {
-                    ResourceUploadResponse body = response.body();
+                    ResourceUploadServiceResponse body = response.body();
                     Log.i(TAG, "resource:" + body.getMovie_url());
                     uploadCallback.onFinish(body);
                 }
             }
 
             @Override
-            public void onFailure(Call<ResourceUploadResponse> call, Throwable t) {
+            public void onFailure(Call<ResourceUploadServiceResponse> call, Throwable t) {
                     Log.e(TAG, "onFailure:" + t.getMessage());
                     uploadCallback.onError();
             }

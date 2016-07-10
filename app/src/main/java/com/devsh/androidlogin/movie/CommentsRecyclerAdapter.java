@@ -30,11 +30,11 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.devsh.androidlogin.Common;
+import com.devsh.androidlogin.common.Common;
 import com.devsh.androidlogin.R;
 import com.devsh.androidlogin.feed.model.Comment;
 import com.devsh.androidlogin.library.data.SharedData;
-import com.devsh.androidlogin.server.ServiceGenerator;
+import com.devsh.androidlogin.utils.ServiceGenerator;
 
 import java.util.List;
 

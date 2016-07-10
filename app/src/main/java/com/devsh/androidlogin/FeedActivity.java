@@ -37,12 +37,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.devsh.androidlogin.common.Common;
+import com.devsh.androidlogin.feed.FeedRecyclerAdapter;
 import com.devsh.androidlogin.feed.FeedService;
 import com.devsh.androidlogin.feed.model.Feed;
 import com.devsh.androidlogin.feed.model.FeedItem;
 import com.devsh.androidlogin.library.AndroidLogin;
 import com.devsh.androidlogin.library.data.SharedData;
-import com.devsh.androidlogin.server.ServiceGenerator;
+import com.devsh.androidlogin.utils.ServiceGenerator;
 
 import java.util.List;
 

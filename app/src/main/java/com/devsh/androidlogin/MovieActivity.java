@@ -31,16 +31,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.devsh.androidlogin.common.Common;
+import com.devsh.androidlogin.feed.FeedRecyclerAdapter;
 import com.devsh.androidlogin.feed.FeedService;
 import com.devsh.androidlogin.feed.model.FeedItem;
-import com.devsh.androidlogin.feedback.FeedbackService;
 import com.devsh.androidlogin.feedback.FeedbackServiceController;
 import com.devsh.androidlogin.library.data.SharedData;
 import com.devsh.androidlogin.movie.CommentService;
 import com.devsh.androidlogin.movie.CommentServiceResponse;
 import com.devsh.androidlogin.movie.CommentsRecyclerAdapter;
 import com.devsh.androidlogin.movie.ServerUpdateCallback;
-import com.devsh.androidlogin.server.ServiceGenerator;
+import com.devsh.androidlogin.utils.ServiceGenerator;
 import com.google.gson.Gson;
 
 import retrofit2.Call;

@@ -21,9 +21,9 @@ package com.devsh.androidlogin.feedback;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.devsh.androidlogin.Common;
+import com.devsh.androidlogin.common.Common;
 import com.devsh.androidlogin.library.data.SharedData;
-import com.devsh.androidlogin.server.ServiceGenerator;
+import com.devsh.androidlogin.utils.ServiceGenerator;
 
 import retrofit2.Call;
 import retrofit2.Callback;

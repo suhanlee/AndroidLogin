@@ -25,7 +25,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.devsh.androidlogin.Common;
+import com.devsh.androidlogin.common.Common;
 import com.devsh.androidlogin.R;
 import com.devsh.androidlogin.gcm.network.GCMServiceController;
 import com.devsh.androidlogin.gcm.network.GCMRegistrationCallback;

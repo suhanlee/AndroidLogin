@@ -22,12 +22,13 @@ import android.content.Context;
 import android.util.Log;
 
 import com.devsh.androidlogin.library.data.SharedData;
+import com.devsh.androidlogin.utils.ServiceGenerator;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ServerLogin {
+public class ServerLoginServiceController {
 
     private static String TAG = "ServerLogin";
     private static String sApiURL;
@@ -46,12 +47,12 @@ public class ServerLogin {
 
         ServerLoginService service = ServiceGenerator.createService(sApiURL, ServerLoginService.class);
 
-        Call<ServerLoginResponse> call = service.login(provider, token, uid, userName, userEmail, userPhoto);
-        call.enqueue(new Callback<ServerLoginResponse>() {
+        Call<ServerLoginServiceResponse> call = service.login(provider, token, uid, userName, userEmail, userPhoto);
+        call.enqueue(new Callback<ServerLoginServiceResponse>() {
             @Override
-            public void onResponse(Call<ServerLoginResponse> call, Response<ServerLoginResponse> response) {
+            public void onResponse(Call<ServerLoginServiceResponse> call, Response<ServerLoginServiceResponse> response) {
                 if (response.isSuccessful()) {
-                    ServerLoginResponse body = response.body();
+                    ServerLoginServiceResponse body = response.body();
                     if (body.success) {
                         SharedData.setLoggedIn(context, true);
                         callback.onSuccess(body.api_token);
@@ -64,7 +65,7 @@ public class ServerLogin {
             }
 
             @Override
-            public void onFailure(Call<ServerLoginResponse> call, Throwable t) {
+            public void onFailure(Call<ServerLoginServiceResponse> call, Throwable t) {
                 Log.i(TAG, "error:");
                 callback.onFail(t.getMessage());
             }

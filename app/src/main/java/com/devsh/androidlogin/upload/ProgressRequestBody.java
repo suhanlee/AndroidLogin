@@ -18,11 +18,8 @@
 
 package com.devsh.androidlogin.upload;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-
-import com.bumptech.glide.load.engine.Resource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,7 +42,7 @@ public class ProgressRequestBody extends RequestBody {
     public interface UploadCallbacks {
         void onProgressUpdate(int percentage);
         void onError();
-        void onFinish(ResourceUploadResponse body);
+        void onFinish(ResourceUploadServiceResponse body);
     }
 
     public ProgressRequestBody(final File file, final  UploadCallbacks listener) {

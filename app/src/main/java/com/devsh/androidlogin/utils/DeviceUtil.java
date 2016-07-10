@@ -16,7 +16,7 @@
  *
  */
 
-package com.devsh.androidlogin;
+package com.devsh.androidlogin.utils;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

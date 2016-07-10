@@ -1,16 +1,11 @@
 package com.devsh.androidlogin;
 
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -19,18 +14,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.devsh.androidlogin.common.Common;
 import com.devsh.androidlogin.gcm.RegistrationIntentService;
 import com.devsh.androidlogin.library.FacebookLoginUtil;
 import com.devsh.androidlogin.library.callback.GoogleLoginInResultCallback;
 import com.devsh.androidlogin.library.AndroidLogin;
 import com.devsh.androidlogin.library.data.SharedData;
-import com.devsh.androidlogin.server.ServerLogin;
+import com.devsh.androidlogin.server.ServerLoginServiceController;
 import com.devsh.androidlogin.server.ServerLoginResultCallback;
 import com.facebook.AccessToken;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -77,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        ServerLogin.initialize(Common.API_BASE_URL);
+        ServerLoginServiceController.initialize(Common.API_BASE_URL);
         AndroidLogin.initialize(this,
                 getString(R.string.twitter_api_key),
                 getString(R.string.twitter_secret_key),
@@ -228,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "token:" + SharedData.getAccountIdToken(getApplicationContext()));
 
             // Try Login
-            ServerLogin.login(getApplicationContext(), new ServerLoginResultCallback() {
+            ServerLoginServiceController.login(getApplicationContext(), new ServerLoginResultCallback() {
                 @Override
                 public void onSuccess(String apiToken) {
                     SharedData.putServerToken(getApplicationContext(), apiToken);

@@ -16,10 +16,9 @@
  *
  */
 
-package com.devsh.androidlogin;
+package com.devsh.androidlogin.feed;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -32,6 +31,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.devsh.androidlogin.MovieActivity;
+import com.devsh.androidlogin.R;
 import com.devsh.androidlogin.feed.model.FeedItem;
 import com.google.gson.Gson;
 

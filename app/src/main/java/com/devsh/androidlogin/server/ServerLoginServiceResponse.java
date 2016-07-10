@@ -18,7 +18,7 @@
 
 package com.devsh.androidlogin.server;
 
-public class ServerLoginResponse {
+public class ServerLoginServiceResponse {
     boolean success;
     String error_message;
     String api_token;

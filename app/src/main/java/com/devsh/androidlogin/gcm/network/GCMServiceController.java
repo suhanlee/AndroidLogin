@@ -21,7 +21,7 @@ package com.devsh.androidlogin.gcm.network;
 import android.content.Context;
 import android.util.Log;
 
-import com.devsh.androidlogin.DeviceUtil;
+import com.devsh.androidlogin.utils.DeviceUtil;
 import com.devsh.androidlogin.library.data.SharedData;
 
 import okhttp3.OkHttpClient;
