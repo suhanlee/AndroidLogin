@@ -19,14 +19,11 @@
 package com.devsh.androidlogin;
 
 import android.app.Activity;
-import android.app.Service;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,14 +33,14 @@ import android.widget.VideoView;
 
 import com.devsh.androidlogin.feed.FeedService;
 import com.devsh.androidlogin.feed.model.FeedItem;
+import com.devsh.androidlogin.feedback.FeedbackService;
+import com.devsh.androidlogin.feedback.FeedbackServiceController;
 import com.devsh.androidlogin.library.data.SharedData;
 import com.devsh.androidlogin.movie.CommentService;
 import com.devsh.androidlogin.movie.CommentServiceResponse;
 import com.devsh.androidlogin.movie.CommentsRecyclerAdapter;
 import com.devsh.androidlogin.movie.ServerUpdateCallback;
 import com.devsh.androidlogin.server.ServiceGenerator;
-import com.devsh.androidlogin.upload.ResourceUploadResponse;
-import com.devsh.androidlogin.upload.ResourceUploadService;
 import com.google.gson.Gson;
 
 import retrofit2.Call;
@@ -74,6 +71,14 @@ public class MovieActivity extends Activity {
     private void initializeUI() {
         txtTitle = (TextView) findViewById(R.id.txt_title);
         txtTitle.setText(feedItem.getTitle());
+
+        Button likeDislikeButton = (Button) findViewById(R.id.like_dislike_button);
+        likeDislikeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FeedbackServiceController.likeOrDislike(getApplicationContext(), feedItem.getMovieId());
+            }
+        });
 
         final EditText editComment = (EditText) findViewById(R.id.edit_comment);
 
