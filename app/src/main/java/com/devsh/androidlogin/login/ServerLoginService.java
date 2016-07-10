@@ -16,7 +16,7 @@
  *
  */
 
-package com.devsh.androidlogin.server;
+package com.devsh.androidlogin.login;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

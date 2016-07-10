@@ -16,7 +16,7 @@
  *
  */
 
-package com.devsh.androidlogin.server;
+package com.devsh.androidlogin.login;
 
 public interface ServerLoginResultCallback {
     void onSuccess(String apiToken);
