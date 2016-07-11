@@ -22,6 +22,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.devsh.androidlogin.library.data.SharedData;
+import com.devsh.androidlogin.utils.DeviceUtil;
 import com.devsh.androidlogin.utils.ServiceGenerator;
 
 import retrofit2.Call;
@@ -44,10 +45,21 @@ public class ServerLoginServiceController {
         String userName = SharedData.getAccountUserName(context);
         String userEmail = SharedData.getAccountUserEmail(context);
         String userPhoto = SharedData.getAccountUserPhoto(context);
+        String pushRegistrationToken = SharedData.getPushRegistrationToken(context);
 
         ServerLoginService service = ServiceGenerator.createService(sApiURL, ServerLoginService.class);
 
-        Call<ServerLoginServiceResponse> call = service.login(provider, token, uid, userName, userEmail, userPhoto);
+        ServerLoginRequest request = new ServerLoginRequest();
+        request.setProvider(provider);
+        request.setUid(uid);
+        request.setToken(token);
+        request.setUserName(userName);
+        request.setUserEmail(userEmail);
+        request.setUserPhoto(userPhoto);
+        request.setRegistrationToken(pushRegistrationToken);
+
+        Call<ServerLoginServiceResponse> call = service.login(request);
+
         call.enqueue(new Callback<ServerLoginServiceResponse>() {
             @Override
             public void onResponse(Call<ServerLoginServiceResponse> call, Response<ServerLoginServiceResponse> response) {

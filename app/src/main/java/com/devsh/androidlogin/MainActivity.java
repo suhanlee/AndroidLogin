@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setUpPush();
+
+
         // Add code to print out the key hash
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
@@ -227,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(String apiToken) {
                     SharedData.putServerToken(getApplicationContext(), apiToken);
-                    setUpPush();
 
                     Intent intent = new Intent(MainActivity.this, FeedActivity.class);
                     startActivity(intent);

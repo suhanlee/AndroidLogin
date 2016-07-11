@@ -17,19 +17,25 @@
  */
 
 package com.devsh.androidlogin.login;
+import retrofit2.http.Body;
 import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.POST;
 
 public interface ServerLoginService {
 
-    @GET("/android/login")
-    Call<ServerLoginServiceResponse> login(@Query("provider") String provider,
-                                           @Query("token") String token,
-                                           @Query("uid") String uid,
-                                           @Query("userName") String username,
-                                           @Query("userEmail") String userEmail,
-                                           @Query("userPhoto") String userPhoto);
+//    @GET("/android/login")
+//    Call<ServerLoginServiceResponse> login(@Query("provider") String provider,
+//                                           @Query("token") String token,
+//                                           @Query("uid") String uid,
+//                                           @Query("userName") String username,
+//                                           @Query("userEmail") String userEmail,
+//                                           @Query("userPhoto") String userPhoto,
+//                                           @Query("registration_token") String registrationToken,
+//                                           @Query("version_name") String versionName,
+//                                           @Query("version_code") String versionCode);
 
+
+    @POST("/android/login")
+    Call<ServerLoginServiceResponse> login(@Body ServerLoginRequest request);
 
 }

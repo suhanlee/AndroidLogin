@@ -38,8 +38,17 @@ public class SharedData {
     private static String ACCOUNT_USER_EMAIL_KEY = "ACCOUNT_USER_EMAIL_KEY";
     private static String ACCOUNT_USER_PHOTO_KEY = "ACCOUNT_USER_PHOTO_KEY";
     private static String SERVER_TOKEN = "SERVER_TOKEN";
+    private static String PUSH_REGISTRATION_TOKEN ="PUSH_REGISTRATION_TOKEN_KEY";
 
     private static String ACCOUNT_LOGGED_IN_KEY = "ACCOUNT_IS_LOGGED_IN_KEY";
+
+    public static void putPushRegistrationToken(Context context, String registrationToken) {
+        putSharedPreferenceString(context, PUSH_REGISTRATION_TOKEN, registrationToken);
+    }
+
+    public static String getPushRegistrationToken(Context context) {
+        return getSharedPreferenceString(context, PUSH_REGISTRATION_TOKEN);
+    }
 
     public static void putServerToken(Context context, String serverToken) {
         putSharedPreferenceString(context, SERVER_TOKEN, serverToken);
@@ -151,7 +160,13 @@ public class SharedData {
     public static void clearSharedPreference(Context context) {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = mSharedPrefs.edit();
+        String registration_token = getSharedPreferenceString(context, PUSH_REGISTRATION_TOKEN);
         editor.clear();
+
+        if (registration_token != null) {
+            putPushRegistrationToken(context, registration_token);
+        }
+
         editor.commit();
     }
 
