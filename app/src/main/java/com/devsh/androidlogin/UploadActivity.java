@@ -18,6 +18,7 @@
 
 package com.devsh.androidlogin;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,7 +42,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UploadActivity extends MainActivity {
+public class UploadActivity extends Activity {
 
     private RecyclerView recyclerview;
     private List<VideoItem> mItems;
@@ -53,6 +54,7 @@ public class UploadActivity extends MainActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_upload);
 
         initAdapterAndRecyclerView();
