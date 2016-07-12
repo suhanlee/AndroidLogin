@@ -70,7 +70,6 @@ public class GCMServiceController {
 
                     if (DEBUG) {
                         Log.d(TAG, "response.isSuccess() == true");
-                        printResponse(result);
                     }
 
                     callback.onResponseSuccess(result);
@@ -86,9 +85,5 @@ public class GCMServiceController {
                 callback.onFailure(call, t);
             }
         });
-    }
-
-    private static void printResponse(GCMServiceResponse result) {
-        Log.i(TAG, "duplicate:" + result.getDuplicate());
     }
 }

@@ -46,8 +46,6 @@ public class FeedbackServiceController {
                     if (body.isSuccess()) {
                         Toast.makeText(context, "Like count:" + body.getLikeCount(), Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    Toast.makeText(context, "Error: Like Action" + body.getErrorMessage(), Toast.LENGTH_LONG).show();
                 }
             }
 

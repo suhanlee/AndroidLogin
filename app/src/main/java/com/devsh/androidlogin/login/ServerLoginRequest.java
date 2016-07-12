@@ -20,90 +20,24 @@ package com.devsh.androidlogin.login;
 
 public class ServerLoginRequest {
 
-    private String provider;
-    private String token;
-    private String uid;
-    private String user_name;
-    private String user_email;
-    private String user_photo;
-    private String registration_token;
-    private String version_name;
-    private String version_code;
+    public String provider;
+    public String token;
+    public String uid;
+    public String user_name;
+    public String user_email;
+    public String user_photo;
+    public String registration_token;
 
-    // getter
-
-    public String getProvider() {
-        return provider;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public String getUserName() {
-        return user_name;
-    }
-
-    public String getUserEmail() {
-        return user_email;
-    }
-
-    public String getUserPhoto() {
-        return user_photo;
-    }
-
-    public String getRegistrationToken() {
-        return registration_token;
-    }
-
-    public String getVersionName() {
-        return version_name;
-    }
-
-    public String getVersionCode() {
-        return version_code;
-    }
-
-    // setter
-
-    public void setProvider(String provider) {
+    public ServerLoginRequest(String provider, String token, String uid,
+                              String user_name, String user_email, String user_photo,
+                              String registration_token) {
         this.provider = provider;
-    }
-
-    public void setToken(String token) {
         this.token = token;
-    }
-
-    public void setUid(String uid) {
         this.uid = uid;
-    }
-
-    public void setUserName(String user_name) {
         this.user_name = user_name;
-    }
-
-    public void setUserEmail(String user_email) {
         this.user_email = user_email;
-    }
-
-    public void setUserPhoto(String user_photo) {
         this.user_photo = user_photo;
-    }
-
-    public void setRegistrationToken(String registration_token) {
         this.registration_token = registration_token;
-    }
-
-    public void setVersionName(String version_name) {
-        this.version_name = version_name;
-    }
-
-    public void setVersionCode(String version_code) {
-        this.version_code = version_code;
     }
 }
 

@@ -49,14 +49,8 @@ public class ServerLoginServiceController {
 
         ServerLoginService service = ServiceGenerator.createService(sApiURL, ServerLoginService.class);
 
-        ServerLoginRequest request = new ServerLoginRequest();
-        request.setProvider(provider);
-        request.setUid(uid);
-        request.setToken(token);
-        request.setUserName(userName);
-        request.setUserEmail(userEmail);
-        request.setUserPhoto(userPhoto);
-        request.setRegistrationToken(pushRegistrationToken);
+        ServerLoginRequest request = new ServerLoginRequest(provider, token, uid,
+                userName, userEmail, userPhoto, pushRegistrationToken);
 
         Call<ServerLoginServiceResponse> call = service.login(request);
 
@@ -79,6 +73,7 @@ public class ServerLoginServiceController {
             @Override
             public void onFailure(Call<ServerLoginServiceResponse> call, Throwable t) {
                 Log.i(TAG, "error:");
+                SharedData.clearSharedPreference(context);
                 callback.onFail(t.getMessage());
             }
         });

@@ -16,8 +16,12 @@
  *
  */
 
-package com.devsh.androidlogin.gcm.network;
+package com.devsh.androidlogin.event;
 
-public class GCMServiceResponse {
-    boolean registration_token;
+public class PushRegisterCompletedEvent {
+    public final String token;
+
+    public PushRegisterCompletedEvent(String token) {
+        this.token = token;
+    }
 }

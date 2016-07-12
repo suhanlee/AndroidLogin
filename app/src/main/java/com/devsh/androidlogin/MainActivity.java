@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.devsh.androidlogin.common.Common;
+import com.devsh.androidlogin.event.PushRegisterCompletedEvent;
 import com.devsh.androidlogin.gcm.RegistrationIntentService;
 import com.devsh.androidlogin.library.FacebookLoginUtil;
 import com.devsh.androidlogin.library.callback.GoogleLoginInResultCallback;
@@ -37,6 +38,10 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -51,36 +56,12 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     private int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private boolean isLoginReady;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setUpPush();
-
-
-        // Add code to print out the key hash
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    "com.devsh.androidlogin",
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-
-        } catch (NoSuchAlgorithmException e) {
-
-        }
-
-        ServerLoginServiceController.initialize(Common.API_BASE_URL);
-        AndroidLogin.initialize(this,
-                getString(R.string.twitter_api_key),
-                getString(R.string.twitter_secret_key),
-                getString(R.string.google_web_client_id)); // twitter, google, facebook
-
+        intialize();
         setContentView(R.layout.activity_main);
 
         if (AndroidLogin.isLogined()) {
@@ -126,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         // Google Login
         AndroidLogin.setGoogleLoginResultCallback(new GoogleLoginInResultCallback() {
             @Override
@@ -154,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Facebook Login
-        // 1. LoginResultCallback
         AndroidLogin.setFacebookLoginResultCallback(new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -177,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        // Facebook Logout
         AndroidLogin.setFacebookLogoutResultCallback(new FacebookLoginUtil.Callback() {
             @Override
             public void onCallback(AccessToken currentToken) {
@@ -185,30 +164,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        // 2. Access Token method
-//        FacebookLoginUtil.getInstance().setLoginCallbackByAccessToken(new FacebookLoginUtil.Callback() {
-//            @Override
-//            public void onCallback(AccessToken currentToken) {
-//                Log.i(TAG, "onCallback: loginCallback");
-//            }
-//        });
-//
-//        FacebookLoginUtil.getInstance().setLogoutCallbackByAccessToken(new FacebookLoginUtil.Callback() {
-//            @Override
-//            public void onCallback(AccessToken currentToken) {
-//                Log.i(TAG, "onCallback: " + currentToken);
-//                updateUI();
-//            }
-//        });
-//
-//        FacebookLoginUtil.getInstance().setUpdateTokenCallbackByAccessToken(new FacebookLoginUtil.Callback() {
-//            @Override
-//            public void onCallback(AccessToken currentToken) {
-//                Log.i(TAG, "onCallback: updateTokenCallback");
-//            }
-//        });
-
         updateUI();
+    }
+
+    private void intialize() {
+        isLoginReady = false;
+        EventBus.getDefault().register(this);
+        setUpPush();
+
+        ServerLoginServiceController.initialize(Common.API_BASE_URL);
+        AndroidLogin.initialize(this,
+                getString(R.string.twitter_api_key),
+                getString(R.string.twitter_secret_key),
+                getString(R.string.google_web_client_id)); // twitter, google, facebook
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(PushRegisterCompletedEvent event) {
+        Toast.makeText(getApplicationContext(), event.token, Toast.LENGTH_SHORT).show();
+        String token = SharedData.getPushRegistrationToken(this);
+        if (token != null) {
+            isLoginReady = true;
+        }
     }
 
     private void setUpPush() {
@@ -239,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFail(String error) {
                     Log.i(TAG, "onFail : " + error);
-                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Server Error" + error, Toast.LENGTH_SHORT).show();
 
                 }
             });
@@ -285,5 +262,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 }

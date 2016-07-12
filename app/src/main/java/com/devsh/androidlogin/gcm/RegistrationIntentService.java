@@ -21,12 +21,12 @@ package com.devsh.androidlogin.gcm;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.devsh.androidlogin.common.Common;
 import com.devsh.androidlogin.R;
+import com.devsh.androidlogin.event.PushRegisterCompletedEvent;
 import com.devsh.androidlogin.gcm.network.GCMServiceController;
 import com.devsh.androidlogin.gcm.network.GCMRegistrationCallback;
 import com.devsh.androidlogin.gcm.network.GCMServiceResponse;
@@ -34,6 +34,8 @@ import com.devsh.androidlogin.library.data.SharedData;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 
@@ -70,6 +72,7 @@ public class RegistrationIntentService extends IntentService {
                 public void onResponseSuccess(GCMServiceResponse result) {
                     Log.i(TAG, "Success");
                     // Subscribe to topic channels
+                    EventBus.getDefault().post(new PushRegisterCompletedEvent(token));
                 }
 
                 @Override

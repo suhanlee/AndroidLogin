@@ -160,14 +160,13 @@ public class SharedData {
     public static void clearSharedPreference(Context context) {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = mSharedPrefs.edit();
-        String registration_token = getSharedPreferenceString(context, PUSH_REGISTRATION_TOKEN);
+        String registration_token = getPushRegistrationToken(context);
         editor.clear();
+        editor.commit();
 
         if (registration_token != null) {
             putPushRegistrationToken(context, registration_token);
         }
-
-        editor.commit();
     }
 
     public static String getAccountProvider(Context context) {

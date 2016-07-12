@@ -23,23 +23,48 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.RemoteViews;
 
+import com.bumptech.glide.Glide;
 import com.devsh.androidlogin.MainActivity;
 import com.devsh.androidlogin.R;
 import com.google.android.gms.gcm.GcmListenerService;
-import com.google.gson.Gson;
+
+import java.util.concurrent.ExecutionException;
 
 public class MyGcmListenerService extends GcmListenerService {
 
     private static final String TAG = "MyGcmListenerService";
     private static String SOCIAL_TYPE="social";
     private static String NOTIFICATION_TYPE = "notification";
+    private int NOTIFICATION_ID = 1233;
+
+    class PushMessage {
+        String type;
+        String icon_url;
+        String title;
+        String message;
+        String redirect_to;
+
+        public PushMessage(String type, String icon_url, String title, String message, String redirect_to) {
+            this.type = type;
+            this.icon_url = icon_url;
+            this.title = title;
+            this.message = message;
+            this.redirect_to = redirect_to;
+        }
+
+        public boolean isIconUrl() {
+            return icon_url == null || !icon_url.equals("");
+        }
+    }
 
     /**
      * Called when message is received.
@@ -51,11 +76,15 @@ public class MyGcmListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         String type = data.getString("type");
+        String icon_url = data.getString("icon_url");
+        String title = data.getString("title");
         String message = data.getString("message");
         String redirectTo = data.getString("redirect_to");
 
-        Gson gson = new Gson();
-        RedirectTo rt = gson.fromJson(redirectTo, RedirectTo.class);
+        PushMessage pushMessage = new PushMessage(type, icon_url, title, message, redirectTo);
+
+//        Gson gson = new Gson();
+//        RedirectTo rt = gson.fromJson(redirectTo, RedirectTo.class);
 
         Log.d(TAG, "token type: " + type);        // Sender-Id
         Log.d(TAG, "token message: " + message);
@@ -72,35 +101,46 @@ public class MyGcmListenerService extends GcmListenerService {
 //            Log.d(TAG, "token redirect_url : " + redirect_url);
 //
 //        }
-        /**
-         * In some cases it may be useful to show a notification indicating to the user
-         * that a message was received.
-         */
-        sendNotification2(message);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        sendNotificationNormal(pushMessage, pendingIntent);
     }
 
-    private void sendNotification2(String message) {
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-
+    private void sendNotificationNormal(PushMessage pushMessage, PendingIntent pendingIntent) {
         Notification.Builder builder = new Notification.Builder(this);
 
-        // 작은 아이콘 이미지.
-        builder.setSmallIcon(R.mipmap.ic_launcher);
+        try {
+            Bitmap largeIcon = Glide
+                    .with(getApplicationContext())
+                    .load(pushMessage.icon_url)
+                    .asBitmap()
+                    .into(100, 100)
+                    .get();
+
+            if (pushMessage.isIconUrl()) {
+                builder.setLargeIcon(largeIcon);
+            }
+
+            builder.setSmallIcon(R.mipmap.ic_launcher);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
         // 알림이 출력될 때 상단에 나오는 문구.
-        builder.setTicker("미리보기 입니다.");
+        builder.setTicker(pushMessage.title);
 
         // 알림 출력 시간.
         builder.setWhen(System.currentTimeMillis());
 
-        // 알림 제목.
-        builder.setContentTitle(getString(R.string.app_name));
-
-//        // 프로그래스 바.
-//        builder.setProgress(100, 50, false);
+        if (pushMessage.title == null) {
+            builder.setContentTitle(getString(R.string.app_name));
+        } else {
+            builder.setContentTitle(pushMessage.title);
+        }
 
         // 알림 내용.
-        builder.setContentText(message);
+        builder.setContentText(pushMessage.message);
 
         // 알림시 사운드, 진동, 불빛을 설정 가능.
         builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS);
@@ -114,36 +154,8 @@ public class MyGcmListenerService extends GcmListenerService {
         // 우선순위.
         builder.setPriority(Notification.PRIORITY_MAX);
 
-//        builder.setVisibility(Notification.VISIBILITY_PUBLIC);
-
-        // 행동 최대3개 등록 가능.
-//        builder.addAction(R.mipmap.ic_launcher, "Show", pendingIntent);
-//        builder.addAction(R.mipmap.ic_launcher, "Hide", pendingIntent);
-//        builder.addAction(R.mipmap.ic_launcher, "Remove", pendingIntent);
-
         // 고유ID로 알림을 생성.
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(123456, builder.build());
-    }
-    /**
-     * Create and show a simple notification containing the received GCM messages.
-     * @param message GCM message received.
-     */
-    private void sendNotification(String message) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setContentTitle("GCM Message")
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setVisibility(View.VISIBLE)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, notificationBuilder.build());
+        nm.notify(NOTIFICATION_ID, builder.build());
     }
 }
