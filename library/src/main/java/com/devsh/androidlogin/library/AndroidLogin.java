@@ -50,22 +50,6 @@ public class AndroidLogin {
         TwitterLoginUtil.getInstance().setCallback(callback);
     }
 
-    public static void loggined(Activity activity, Intent intent) {
-        if (SharedData.getAccountProvider(activity).equals(SharedData.PROVIDER_GOOGLE)) {
-            GoogleLoginUtil.getInstance().signIn(activity);
-        }
-
-        if (SharedData.getAccountProvider(activity).equals(SharedData.PROVIDER_FACEBOOK)) {
-
-        }
-
-        if (SharedData.getAccountProvider(activity).equals(SharedData.PROVIDER_TWITTER)) {
-
-        }
-
-        activity.startActivity(intent);
-    }
-
     public static void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TWITTER_REQUEST_CODE) {
             SharedData.putAccountProvider(sContext, SharedData.PROVIDER_TWITTER);
@@ -109,17 +93,20 @@ public class AndroidLogin {
         FacebookLoginUtil.initialize(context);
     }
 
-    public static void initialize2(Context context) {
-        sContext = context;
-        FacebookLoginUtil.initialize(context);
-    }
-
     public static void loginWithGoogle(Activity activity) {
+        if (!NetworkUtil.checkOnelineAndToast(activity)) {
+            return;
+        }
+
         SharedData.putAccountProvider(activity, SharedData.PROVIDER_GOOGLE);
         GoogleLoginUtil.getInstance().signIn(activity);
     }
 
     public static void loginWithFacebook(Activity activity, List<String> user_status) {
+        if (!NetworkUtil.checkOnelineAndToast(activity)) {
+            return;
+        }
+
         SharedData.putAccountProvider(activity, SharedData.PROVIDER_FACEBOOK);
         FacebookLoginUtil.getInstance().logIn(activity, user_status);
     }
@@ -149,7 +136,24 @@ public class AndroidLogin {
         FacebookLoginUtil.getInstance().logout();
     }
 
-    public static boolean isLogined() {
+    public static boolean isLocalLogined() {
+        return isSocialLoginIn();
+    }
+
+    public static boolean isAccountLoginedWithServer() {
+        return isLoginedInWithServer();
+    }
+
+    public static boolean isSocialLoginIn() {
+        return SharedData.getAccountId(sContext) != null
+                && SharedData.getAccountIdToken(sContext) != null;
+    }
+
+    public static boolean isLoginedInWithServer() {
+        return isSocialLoginIn() && SharedData.getServerLoggedIn(sContext);
+    }
+
+    public static boolean isLoginedWithGoogle() {
         return GoogleLoginUtil.getInstance().isSignedIn(sContext);
     }
 

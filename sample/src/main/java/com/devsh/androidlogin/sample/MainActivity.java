@@ -32,11 +32,9 @@ import com.devsh.androidlogin.library.AndroidLogin;
 import com.devsh.androidlogin.library.FacebookLoginUtil;
 import com.devsh.androidlogin.library.callback.GoogleLoginInResultCallback;
 import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -66,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        if (AndroidLogin.isLogined()) {
+        if (AndroidLogin.isLocalLogined()) {
 //
         }
 
@@ -91,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         btnGoogleSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (AndroidLogin.isLogined()) {
+                if (AndroidLogin.isLocalLogined()) {
                     AndroidLogin.logoutWithGoogle();
                 } else {
                     AndroidLogin.loginWithGoogle(MainActivity.this);
@@ -182,13 +180,13 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (AndroidLogin.isLogined()) {
+                if (AndroidLogin.isLocalLogined()) {
                     btnGoogleSignin.setText("Google Logout");
                 } else {
                     btnGoogleSignin.setText("Google Login");
                 }
 
-                if (AndroidLogin.isLogined()) {
+                if (AndroidLogin.isLocalLogined()) {
                     btnFacebookSignIn.setText("Facebook Logout");
                 } else {
                     btnFacebookSignIn.setText("Facebook Login");

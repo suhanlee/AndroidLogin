@@ -177,11 +177,11 @@ public class SharedData {
         putSharedPreferenceString(context, ACCOUNT_PROVIDER_KEY, provider);
     }
 
-    public static boolean isLoggedIn(Context context) {
+    public static boolean getServerLoggedIn(Context context) {
         return getSharedPreferenceBoolean(context, ACCOUNT_LOGGED_IN_KEY);
     }
 
-    public static void setLoggedIn(Context context, boolean isLoggedIn) {
+    public static void putServerLoggedIn(Context context, boolean isLoggedIn) {
         putSharedPreferenceBoolean(context, ACCOUNT_LOGGED_IN_KEY, isLoggedIn);
     }
 }

@@ -22,7 +22,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.devsh.androidlogin.library.data.SharedData;
-import com.devsh.androidlogin.utils.DeviceUtil;
 import com.devsh.androidlogin.utils.ServiceGenerator;
 
 import retrofit2.Call;
@@ -60,10 +59,10 @@ public class ServerLoginServiceController {
                 if (response.isSuccessful()) {
                     ServerLoginServiceResponse body = response.body();
                     if (body.success) {
-                        SharedData.setLoggedIn(context, true);
+                        SharedData.putServerLoggedIn(context, true);
                         callback.onSuccess(body.api_token);
                     } else {
-                        SharedData.setLoggedIn(context, false);
+                        SharedData.putServerLoggedIn(context, false);
                         SharedData.clearSharedPreference(context);
                         callback.onFail(body.error_message);
                     }

@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -54,6 +55,7 @@ public class MovieActivity extends Activity {
     private TextView txtTitle;
     private VideoView movieView;
     private RecyclerView recyclerView;
+    private long mLastClickTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +115,12 @@ public class MovieActivity extends Activity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) {
+                    return;
+                }
+
+                mLastClickTime = SystemClock.elapsedRealtime();
+
                 postComment(editComment.getText().toString());
             }
         });
