@@ -24,17 +24,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.View;
-import android.widget.RemoteViews;
 
 import com.bumptech.glide.Glide;
-import com.devsh.androidlogin.MainActivity;
+import com.devsh.androidlogin.FeedActivity;
+import com.devsh.androidlogin.MovieActivity;
 import com.devsh.androidlogin.R;
+import com.devsh.androidlogin.common.Common;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import java.util.concurrent.ExecutionException;
@@ -83,25 +80,14 @@ public class MyGcmListenerService extends GcmListenerService {
 
         PushMessage pushMessage = new PushMessage(type, icon_url, title, message, redirectTo);
 
-//        Gson gson = new Gson();
-//        RedirectTo rt = gson.fromJson(redirectTo, RedirectTo.class);
-
         Log.d(TAG, "token type: " + type);        // Sender-Id
         Log.d(TAG, "token message: " + message);
 
-//        if (type != null && type.equals(SOCIAL_TYPE)) {
-//            String title = data.getString("title");
-//            String description = data.getString("description");
-//            String image_url = data.getString("image_url");
-//            String redirect_url = data.getString("redirect_url");
-//
-//            Log.d(TAG, "token title : " + title);
-//            Log.d(TAG, "token description : " + description);
-//            Log.d(TAG, "token image_url : " + image_url);
-//            Log.d(TAG, "token redirect_url : " + redirect_url);
-//
-//        }
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent notificationIntent = new Intent(getApplicationContext(), FeedActivity.class);
+        notificationIntent.putExtra(Common.REDIRECT_TO_KEY, redirectTo);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         sendNotificationNormal(pushMessage, pendingIntent);
     }
 

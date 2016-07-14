@@ -21,4 +21,17 @@ package com.devsh.androidlogin.gcm;
 public class RedirectTo {
     public String movie_id;
     public String comment_id;
+
+    public RedirectTo(String movie_id, String commnet_id) {
+        this.movie_id = movie_id;
+        this.comment_id = commnet_id;
+    }
+
+    public String getMovieId() {
+        return movie_id;
+    }
+
+    public String getCommentId() {
+        return comment_id;
+    }
 }

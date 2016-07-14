@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     private Button btnFacebookSignIn;
     private Button btnGoogleSignin;
     private TwitterLoginButton btnTwitterLogin;
-    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     private int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private boolean isLoginReady;
@@ -60,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (AndroidLogin.isLocalLogined()) {
-            tryLogin();
+//            tryLogin();
+           goToFeedActivity();
         }
 
         btnTwitterLogin = (TwitterLoginButton) findViewById(R.id.btnTwitterLogin);
@@ -207,9 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onSuccess(String apiToken) {
                     SharedData.putServerToken(getApplicationContext(), apiToken);
 
-                    Intent intent = new Intent(MainActivity.this, FeedActivity.class);
-                    startActivity(intent);
-                    finish();
+                    goToFeedActivity();
                 }
 
                 @Override
@@ -219,6 +217,12 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+    }
+
+    public void goToFeedActivity() {
+        Intent intent = new Intent(MainActivity.this, FeedActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     public void updateUI() {

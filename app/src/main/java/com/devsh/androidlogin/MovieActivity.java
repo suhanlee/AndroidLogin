@@ -19,6 +19,7 @@
 package com.devsh.androidlogin;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,11 +34,12 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.devsh.androidlogin.common.Common;
-import com.devsh.androidlogin.feed.FeedRecyclerAdapter;
 import com.devsh.androidlogin.feed.FeedService;
+import com.devsh.androidlogin.feed.model.Comment;
 import com.devsh.androidlogin.feed.model.FeedItem;
 import com.devsh.androidlogin.feedback.FeedbackServiceCallback;
 import com.devsh.androidlogin.feedback.FeedbackServiceController;
+import com.devsh.androidlogin.gcm.RedirectTo;
 import com.devsh.androidlogin.library.data.SharedData;
 import com.devsh.androidlogin.movie.CommentService;
 import com.devsh.androidlogin.movie.CommentServiceResponse;
@@ -46,12 +48,13 @@ import com.devsh.androidlogin.movie.ServerUpdateCallback;
 import com.devsh.androidlogin.utils.ServiceGenerator;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MovieActivity extends Activity {
-    private FeedItem feedItem;
     private CommentsRecyclerAdapter adapter;
 
     private TextView txtTitle;
@@ -61,37 +64,49 @@ public class MovieActivity extends Activity {
     private VideoView movieView;
     private RecyclerView recyclerView;
     private long mLastClickTime = 0;
+    private RedirectTo redirectTo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_movie);
         super.onCreate(savedInstanceState);
 
-        String temp = getIntent().getExtras().getString(FeedRecyclerAdapter.FEED_ITEM_KEY);
-        Gson gson = new Gson();
-        feedItem = gson.fromJson(temp, FeedItem.class);
-
-        getFeedItem(feedItem.getMovieId());
-
+        getRedirectToDataFromIntent();
         initializeUI();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getRedirectToDataFromIntent();
+        getMovieDataFromServer(redirectTo.getMovieId());
+    }
+
+    private void getRedirectToDataFromIntent() {
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            if(extras.containsKey(Common.REDIRECT_TO_KEY)) {
+                String rt = extras.getString(Common.REDIRECT_TO_KEY);
+                Gson gson = new Gson();
+                redirectTo = gson.fromJson(rt, RedirectTo.class);
+            }
+        }
     }
 
     private void initializeUI() {
         txtTitle = (TextView) findViewById(R.id.txt_title);
-        txtTitle.setText(feedItem.getTitle());
 
         txtTags = (TextView) findViewById(R.id.txt_tags);
-        txtTags.setText("tags: " + feedItem.getTags());
 
         txtLike = (TextView) findViewById(R.id.txt_like);
-        txtLike.setText(feedItem.getFeedback().getLike());
 
         Button likeDislikeButton = (Button) findViewById(R.id.like_dislike_button);
         likeDislikeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FeedbackServiceController.likeOrDislike(getApplicationContext(),
-                        feedItem.getMovieId(), new FeedbackServiceCallback() {
+                        redirectTo.getMovieId(), new FeedbackServiceCallback() {
                             @Override
                             public void onSuccess(String likeCount) {
                                 Toast.makeText(getApplicationContext(), "Like count:" + likeCount, Toast.LENGTH_LONG).show();
@@ -104,25 +119,15 @@ public class MovieActivity extends Activity {
         final EditText editComment = (EditText) findViewById(R.id.edit_comment);
 
         movieView = (VideoView) findViewById(R.id.movie_view);
-        movieView.setVideoURI(Uri.parse(feedItem.getMovie_url()));
-        movieView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-            }
-        });
-        movieView.start();
-
         recyclerView = (RecyclerView) findViewById(R.id.comments_recycler_view);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setHasFixedSize(true);
 
-        adapter = new CommentsRecyclerAdapter(MovieActivity.this, feedItem.getMovieId(), feedItem.getComments());
+        adapter = new CommentsRecyclerAdapter(MovieActivity.this, redirectTo.getMovieId(), new ArrayList<Comment>());
         adapter.setUpdateCallback(new ServerUpdateCallback() {
                                       @Override
                                       public void onSuccess() {
-                                        getMovieDataFromServer(feedItem.getMovieId());
+                                        getMovieDataFromServer(redirectTo.getMovieId());
                                       }
                                   });
 
@@ -147,7 +152,7 @@ public class MovieActivity extends Activity {
     private void postComment(String message) {
         CommentService service = ServiceGenerator.createService(Common.API_BASE_URL, CommentService.class);
 
-        Call<CommentServiceResponse> call = service.postComment(SharedData.getServerToken(getApplicationContext()), feedItem.getMovieId(), message);
+        Call<CommentServiceResponse> call = service.postComment(SharedData.getServerToken(getApplicationContext()), redirectTo.getMovieId(), message);
         call.enqueue(new Callback<CommentServiceResponse>() {
 
             @Override
@@ -156,7 +161,7 @@ public class MovieActivity extends Activity {
                 if (response.isSuccessful()) {
                     if (body.getSuccess()) {
                         Toast.makeText(getApplicationContext(), "Post comment", Toast.LENGTH_LONG).show();
-                        getMovieDataFromServer(feedItem.getMovieId());
+                        getMovieDataFromServer(redirectTo.getMovieId());
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Error: Post Comment ", Toast.LENGTH_LONG).show();
@@ -191,13 +196,21 @@ public class MovieActivity extends Activity {
     }
 
     private void updateMovieDetail(FeedItem feedItem) {
+
+        if (!movieView.isPlaying()) {
+            movieView.setVideoURI(Uri.parse(feedItem.getMovie_url()));
+            movieView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mp.setLooping(true);
+                }
+            });
+            movieView.start();
+        }
+
         txtTitle.setText(feedItem.getTitle());
         txtTags.setText(feedItem.getTags());
         txtLike.setText(feedItem.getFeedback().getLike());
         adapter.setCommentList(feedItem.getComments());
-    }
-
-    public void getFeedItem(String movieId) {
-        getMovieDataFromServer(movieId);
     }
 }

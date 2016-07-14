@@ -66,6 +66,8 @@ public class FeedActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        redirectToMovieFromIntent();
+
         setContentView(R.layout.activity_feed_nav);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -143,6 +145,49 @@ public class FeedActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        redirectToMovieFromIntent();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        redirectToMovieFromIntent(intent);
+    }
+
+    private void redirectToMovieFromIntent(Intent intent) {
+        if (intent == null) {
+            intent = getIntent();
+        }
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            if(extras.containsKey(Common.REDIRECT_TO_KEY)) {
+                Intent feedIntent = new Intent(FeedActivity.this, MovieActivity.class);
+                feedIntent.putExtra(Common.REDIRECT_TO_KEY, extras.getString(Common.REDIRECT_TO_KEY));
+                getIntent().removeExtra(Common.REDIRECT_TO_KEY);
+                startActivity(feedIntent);
+
+            }
+        }
+    }
+
+    private void redirectToMovieFromIntent() {
+       redirectToMovieFromIntent(null);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+    }
+
+    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
@@ -155,7 +200,7 @@ public class FeedActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             AndroidLogin.logout();
-            goToStartActivity();
+            goToMainActivity();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -168,7 +213,7 @@ public class FeedActivity extends AppCompatActivity
 
     }
 
-    private void goToStartActivity() {
+    private void goToMainActivity() {
         Intent intent = new Intent(FeedActivity.this, MainActivity.class);
         startActivity(intent);
         finish();

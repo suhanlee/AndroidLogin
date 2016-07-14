@@ -33,7 +33,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.devsh.androidlogin.MovieActivity;
 import com.devsh.androidlogin.R;
+import com.devsh.androidlogin.common.Common;
 import com.devsh.androidlogin.feed.model.FeedItem;
+import com.devsh.androidlogin.gcm.RedirectTo;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -97,8 +99,10 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                 Intent intent = new Intent(activity, MovieActivity.class);
                 Bundle bundle = new Bundle();
 
-                String json = (new Gson()).toJson(feedItem);
-                bundle.putString(FEED_ITEM_KEY, json);
+                RedirectTo redirectTo = new RedirectTo(feedItem.getMovieId(), null);
+
+                String json = (new Gson()).toJson(redirectTo);
+                bundle.putString(Common.REDIRECT_TO_KEY, json);
 
                 intent.putExtras(bundle);
 
