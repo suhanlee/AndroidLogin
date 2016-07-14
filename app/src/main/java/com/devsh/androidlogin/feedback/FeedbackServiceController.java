@@ -31,7 +31,7 @@ import retrofit2.Response;
 
 public class FeedbackServiceController {
 
-    public static void likeOrDislike(final Context context, String movieId) {
+    public static void likeOrDislike(final Context context, String movieId, final FeedbackServiceCallback callback) {
         FeedbackService service = ServiceGenerator.createService(Common.API_BASE_URL, FeedbackService.class);
         String apiToken = SharedData.getServerToken(context);
         FeedbackServiceRequest request = new FeedbackServiceRequest(apiToken, movieId);
@@ -44,7 +44,7 @@ public class FeedbackServiceController {
                 FeedbackServiceResponse body = response.body();
                 if (response.isSuccessful()) {
                     if (body.isSuccess()) {
-                        Toast.makeText(context, "Like count:" + body.getLikeCount(), Toast.LENGTH_LONG).show();
+                        callback.onSuccess(body.getLikeCount());
                     }
                 }
             }

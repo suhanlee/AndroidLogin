@@ -18,6 +18,7 @@
 
 package com.devsh.androidlogin.upload;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.util.Log;
 
@@ -39,19 +40,19 @@ public class ResourceUploadServiceController {
 
     private static String TAG = "UploadStorage";
 
-    public static void uploadImageFile(Context context, File file, String titleValue, final ProgressRequestBody.UploadCallbacks uploadCallback) {
+    public static void uploadImageFile(Context context, File file, String titleValue, String tagsValue, final ProgressRequestBody.UploadCallbacks uploadCallback) {
         ResourceUploadService service = ServiceGenerator.createService(Common.API_BASE_URL, ResourceUploadService.class);
         Map<String, RequestBody> map = new HashMap<>();
 
-        String mimeType;
-        mimeType = getMimeType(file);
-
         RequestBody api_key = RequestBody.create(MediaType.parse("text/plain"), SharedData.getServerToken(context));
         RequestBody title = RequestBody.create(MediaType.parse("text/plain"), titleValue);
+        RequestBody tags = RequestBody.create(MediaType.parse("text/plain"), tagsValue);
         RequestBody upload = new ProgressRequestBody(file, uploadCallback);
 
         map.put("api_token", api_key);
         map.put("movie[title]", title);
+        map.put("movie[tags]", tags);
+
         map.put("movie[upload]" + "\"; filename=" + file.getName().trim(), upload);
 
         Call<ResourceUploadServiceResponse> call = service.uploadImage(map);

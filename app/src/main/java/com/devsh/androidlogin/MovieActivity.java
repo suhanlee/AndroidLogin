@@ -36,6 +36,7 @@ import com.devsh.androidlogin.common.Common;
 import com.devsh.androidlogin.feed.FeedRecyclerAdapter;
 import com.devsh.androidlogin.feed.FeedService;
 import com.devsh.androidlogin.feed.model.FeedItem;
+import com.devsh.androidlogin.feedback.FeedbackServiceCallback;
 import com.devsh.androidlogin.feedback.FeedbackServiceController;
 import com.devsh.androidlogin.library.data.SharedData;
 import com.devsh.androidlogin.movie.CommentService;
@@ -52,7 +53,11 @@ import retrofit2.Response;
 public class MovieActivity extends Activity {
     private FeedItem feedItem;
     private CommentsRecyclerAdapter adapter;
+
     private TextView txtTitle;
+    private TextView txtTags;
+    private TextView txtLike;
+
     private VideoView movieView;
     private RecyclerView recyclerView;
     private long mLastClickTime = 0;
@@ -75,11 +80,24 @@ public class MovieActivity extends Activity {
         txtTitle = (TextView) findViewById(R.id.txt_title);
         txtTitle.setText(feedItem.getTitle());
 
+        txtTags = (TextView) findViewById(R.id.txt_tags);
+        txtTags.setText("tags: " + feedItem.getTags());
+
+        txtLike = (TextView) findViewById(R.id.txt_like);
+        txtLike.setText(feedItem.getFeedback().getLike());
+
         Button likeDislikeButton = (Button) findViewById(R.id.like_dislike_button);
         likeDislikeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FeedbackServiceController.likeOrDislike(getApplicationContext(), feedItem.getMovieId());
+                FeedbackServiceController.likeOrDislike(getApplicationContext(),
+                        feedItem.getMovieId(), new FeedbackServiceCallback() {
+                            @Override
+                            public void onSuccess(String likeCount) {
+                                Toast.makeText(getApplicationContext(), "Like count:" + likeCount, Toast.LENGTH_LONG).show();
+                                txtLike.setText(likeCount);
+                            }
+                        });
             }
         });
 
@@ -173,6 +191,9 @@ public class MovieActivity extends Activity {
     }
 
     private void updateMovieDetail(FeedItem feedItem) {
+        txtTitle.setText(feedItem.getTitle());
+        txtTags.setText(feedItem.getTags());
+        txtLike.setText(feedItem.getFeedback().getLike());
         adapter.setCommentList(feedItem.getComments());
     }
 

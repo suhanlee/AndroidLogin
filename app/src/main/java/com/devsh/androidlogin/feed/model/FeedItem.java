@@ -23,6 +23,7 @@ import java.util.List;
 public class FeedItem {
     private String movie_id;
     private String title;
+    private String tags;
     private String movie_url;
     private String thumb_movie_url;
     private String movie_content_type;
@@ -36,6 +37,10 @@ public class FeedItem {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getTags() {
+        return "#" + tags;
     }
 
     public String getMovie_url() {

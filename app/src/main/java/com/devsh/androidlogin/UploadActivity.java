@@ -53,6 +53,7 @@ public class UploadActivity extends Activity {
     private String TAG = "UploadActivity";
 
     private long mLastClickTime = 0;
+    private EditText editTags;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,7 @@ public class UploadActivity extends Activity {
         initAdapterAndRecyclerView();
 
         editTitle = (EditText)findViewById(R.id.editTitle);
+        editTags = (EditText)findViewById(R.id.editTags);
 
         Button btnAddPlus = (Button) findViewById(R.id.btnPlus);
         btnAddPlus.setOnClickListener(new View.OnClickListener() {
@@ -107,10 +109,11 @@ public class UploadActivity extends Activity {
 
     private void uploadFileFromGallery() {
         String title = editTitle.getText().toString();
+        String tags = editTags.getText().toString();
 
         for(VideoItem item : mItems) {
             if (item.isImage()) {
-                ResourceUploadServiceController.uploadImageFile(getApplicationContext(), new File(item.getThumbnailPath()), title, new ProgressRequestBody.UploadCallbacks() {
+                ResourceUploadServiceController.uploadImageFile(getApplicationContext(), new File(item.getThumbnailPath()), title, tags, new ProgressRequestBody.UploadCallbacks() {
                     @Override
                     public void onProgressUpdate(int percentage) {
                         progressDialog.setProgress(percentage);
